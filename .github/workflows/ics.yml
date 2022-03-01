@@ -1,0 +1,26 @@
+name: ICS Generator
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Run generator
+        run: date +%s > ./docs/index.html
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: docs/*.html
+          commit_message: generate .ics file automatically
+          commit_user_name: bugstep
+          commit_user_email: github@isaacx.com
