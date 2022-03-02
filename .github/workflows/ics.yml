@@ -4,10 +4,10 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - "**"
 
 jobs:
-  generate:
+  commit:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,7 +15,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Setup Go environment
+      - name: Setup Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.17
@@ -23,12 +23,12 @@ jobs:
       - name: Go Build
         run: go build -o . main
 
-      - name: Run Generator
-        run: ./main > ./docs/index.html
+      - name: Generate ICS
+        run: ./main
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          file_pattern: docs/*.html
+          file_pattern: docs/*.html docs/*.ics
           commit_message: generate .ics file automatically
           commit_user_name: bugstep
           commit_user_email: github@isaacx.com

@@ -2,17 +2,34 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"main/parse/read"
+	"os"
 )
 
 func main() {
-	files, err := ioutil.ReadDir("./data/")
+	data := read.InDir("./data/").Data()
+	output := fmt.Sprintf("%+v", data)
+	fmt.Println(output)
+	write("./docs/index.html", output)
+	write("./docs/holiday.ics", output)
+}
+
+func write(file, data string) {
+
+	f, err := os.Create(file)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, file := range files {
-		fmt.Println(file.Name(), file.IsDir())
+	defer f.Close()
+
+	n, err := f.WriteString(data)
+
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	fmt.Println(n, "done")
 }
