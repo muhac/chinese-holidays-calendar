@@ -1,0 +1,52 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Go Build
+        run: go build -v ./...
+
+      - name: Go Test
+        run: go test ./... -shuffle on -count 10 -coverprofile cover.out
+
+      - name: Go Vet
+        run: go test -v ./... -vet all
+
+      - name: Coverage
+        run: go tool cover -func cover.out
+
+  golint:
+    name: Golint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          working-directory: .
