@@ -1,7 +1,6 @@
 package core
 
 import (
-	"main/parse/base"
 	"strings"
 )
 
@@ -21,22 +20,22 @@ func (data RawInfo) Parse() (result Holidays, err error) {
 
 		info := strings.Split(holiday, ";")
 
-		for i, day := range base.DayRange(info[1]) {
+		for i, day := range holidays(data.Year, info[1]) {
 			restDay := Holiday{
 				Name: info[0],
 				Nth:  i + 1,
-				Date: base.Date(data.Year, day),
-				Type: base.Rest,
+				Date: date(data.Year, day),
+				Type: Rest,
 			}
 			result = append(result, restDay)
 		}
 
-		for i, day := range base.DayRange(info[2]) {
+		for i, day := range holidays(data.Year, info[2]) {
 			workDay := Holiday{
 				Name: info[0],
 				Nth:  i + 1,
-				Date: base.Date(data.Year, day),
-				Type: base.Work,
+				Date: date(data.Year, day),
+				Type: Work,
 			}
 			result = append(result, workDay)
 		}
