@@ -1,11 +1,13 @@
 package read
 
-import "main/parse/base"
+import (
+	"main/parse/core"
+)
 
-type Parser interface {
-	Data() []base.Holiday
+type Reader interface {
+	Read() core.Raw
 }
 
-func InDir(path string) Parser {
+func From(path string) Reader {
 	return dataLoader{Dir: path}
 }

@@ -8,9 +8,12 @@ import (
 )
 
 func main() {
-	data := read.InDir("./data/").Data()
+	data := read.From("./data/").Read().Parse()
+	for _, d := range data {
+		fmt.Println(fmt.Sprintf("%+v", d))
+	}
+
 	output := fmt.Sprintf("%+v", data)
-	fmt.Println(output)
 	write("./docs/index.html", output)
 	write("./docs/holiday.ics", output)
 }
@@ -31,5 +34,5 @@ func write(file, data string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(n, "done")
+	fmt.Println(file, n, "done")
 }
