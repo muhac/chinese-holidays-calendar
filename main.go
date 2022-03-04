@@ -1,18 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"main/parse/read"
-	"main/parse/write"
+	"main/parse/base"
+	"main/parse/core"
 )
 
 func main() {
-	data := read.From("./data/").Read().Parse()
-	for _, d := range data {
-		fmt.Printf("%+v\n", d)
-	}
+	holidays := core.Data().ReadFrom(base.SourceDir).Parse().Sort().Get()
 
-	output := fmt.Sprintf("%+v", data)
-	write.To("./docs/index.html", output)
-	write.To("./docs/holiday.ics", output)
+	holidays.Print("==== HOLIDAYS ====")
+
+	core.Data(holidays).WriteTo(base.IndexPage).Format(base.ICS).Set()
+	core.Data(holidays).WriteTo(base.HolidayICS).Format(base.ICS).Set()
 }
