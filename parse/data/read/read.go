@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"main/parse/core"
+	"main/parse/data"
 	"regexp"
 	"strconv"
 	"sync"
 )
 
-type dataLoader struct {
+func NewReader(dir string) data.Reader {
+	return dataReader{Dir: dir}
+}
+
+type dataReader struct {
 	Dir string
 }
 
@@ -19,21 +23,21 @@ type fileInfo struct {
 	Year int
 }
 
-func (l dataLoader) Read() (result core.Raw) {
-	resultChan := make(chan core.RawInfo)
+func (dw dataReader) Read() (result data.Input) {
+	resultChan := make(chan data.InputRaw)
 	wg := new(sync.WaitGroup)
 
-	for _, f := range l.fileList() {
+	for _, f := range dw.fileList() {
 		wg.Add(1)
 
 		go func(file fileInfo) {
 			defer wg.Done()
-			raw, err := l.load(file.Name)
+			raw, err := dw.load(file.Name)
 			if err != nil {
 				fmt.Printf("Error loading %s: %s", file.Name, err)
 				return
 			}
-			resultChan <- core.RawInfo{Year: file.Year, Data: raw}
+			resultChan <- data.InputRaw{Year: file.Year, Data: raw}
 		}(f)
 	}
 
@@ -48,8 +52,8 @@ func (l dataLoader) Read() (result core.Raw) {
 	return result
 }
 
-func (l dataLoader) fileList() (result []fileInfo) {
-	files, err := ioutil.ReadDir(l.Dir)
+func (dw dataReader) fileList() (result []fileInfo) {
+	files, err := ioutil.ReadDir(dw.Dir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,8 +66,8 @@ func (l dataLoader) fileList() (result []fileInfo) {
 	return result
 }
 
-func (l dataLoader) load(filename string) (result string, err error) {
-	data, err := ioutil.ReadFile(l.Dir + filename)
+func (dw dataReader) load(filename string) (result string, err error) {
+	data, err := ioutil.ReadFile(dw.Dir + filename)
 	if err != nil {
 		return result, err
 	}
