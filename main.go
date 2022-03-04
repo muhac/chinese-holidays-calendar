@@ -2,34 +2,17 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"main/parse/read"
-	"os"
+	"main/parse/write"
 )
 
 func main() {
-	data := read.InDir("./data/").Data()
+	data := read.From("./data/").Read().Parse()
+	for _, d := range data {
+		fmt.Printf("%+v\n", d)
+	}
+
 	output := fmt.Sprintf("%+v", data)
-	fmt.Println(output)
-	write("./docs/index.html", output)
-	write("./docs/holiday.ics", output)
-}
-
-func write(file, data string) {
-
-	f, err := os.Create(file)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer f.Close()
-
-	n, err := f.WriteString(data)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(n, "done")
+	write.To("./docs/index.html", output)
+	write.To("./docs/holiday.ics", output)
 }
