@@ -1,17 +1,28 @@
 package output
 
 import (
-	"fmt"
 	"main/parse/base"
 	"main/parse/data"
 )
 
 func NewFormatter(format string) data.Formatter {
-	return formatter{}
+	return formatterICS{}
 }
 
-type formatter struct{}
+type formatterICS struct{}
 
-func (f formatter) Format(info base.Holidays) data.Output {
-	return data.Output(fmt.Sprintf("%+v", info))
+func (f formatterICS) Format(info base.Holidays) (result data.Output) {
+	result.Prefix = IcsHead
+	result.Suffix = IcsTail
+
+	for _, day := range info {
+		outputDay := event{
+			Group: day.Group,
+			Title: getTitle(day),
+			Date:  day.Date,
+			Desc:  getDesc(day),
+		}
+		result.Body = append(result.Body, outputDay.Ics())
+	}
+	return
 }
