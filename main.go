@@ -1,18 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"log"
+	"main/parse/base"
+	"main/parse/core"
 )
 
 func main() {
-	files, err := ioutil.ReadDir("./data/")
-	if err != nil {
-		log.Fatal(err)
-	}
+	holidays := core.Data().ReadFrom(base.SourceDir).Parse().Sort().Get()
 
-	for _, file := range files {
-		fmt.Println(file.Name(), file.IsDir())
-	}
+	holidays.Print("==== HOLIDAYS ====")
+
+	core.Data(holidays).WriteTo(base.IndexPage).Format(base.ICS).Set()
+	core.Data(holidays).WriteTo(base.HolidayICS).Format(base.ICS).Set()
 }
