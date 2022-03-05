@@ -8,7 +8,7 @@ import (
 
 const (
 	IcsHead  = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Rank Technology//Chinese Holidays//EN"
-	IcsEvent = "BEGIN:VEVENT\nDTSTART:%s\nDTEND:%s\nSUMMARY:%s\nDESCRIPTION:%s\nEND:VEVENT"
+	IcsEvent = "BEGIN:VEVENT\nDTSTART;VALUE=DATE:%s\nSUMMARY:%s\nDESCRIPTION:%s\nEND:VEVENT"
 	IcsTail  = "END:VCALENDAR"
 )
 
@@ -24,8 +24,7 @@ type event struct {
 func (d event) Ics() string {
 	return fmt.Sprintf(
 		IcsEvent,
-		d.Date.Format("20060102T150405"),
-		d.Date.Add(time.Hour*24).Format("20060102T150405"),
+		d.Date.Format("20060102"),
 		d.Title,
 		d.Desc,
 	)
