@@ -31,18 +31,18 @@ func (d event) Ics() string {
 	)
 }
 
-func getTitle(item base.Holiday) string {
-	status := map[int]string{
+func getStatusName(status int) string {
+	name := map[int]string{
 		base.Rest: "假期",
 		base.Work: "补班",
 	}
-	return fmt.Sprintf("%s %s第%d天", item.Name, status[item.Type], item.Nth)
+	return name[status]
+}
+
+func getTitle(item base.Holiday) string {
+	return fmt.Sprintf("%s%s", item.Name, getStatusName(item.Type))
 }
 
 func getDesc(item base.Holiday) string {
-	status := map[int]string{
-		base.Rest: "假期",
-		base.Work: "补班",
-	}
-	return fmt.Sprintf("%s第%d天", status[item.Type], item.Nth)
+	return fmt.Sprintf("%s 第%d天/共%d天", getStatusName(item.Type), item.Nth, item.Total)
 }

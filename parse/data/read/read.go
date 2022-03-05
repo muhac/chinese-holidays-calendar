@@ -100,7 +100,7 @@ func lines(data string) (result []string) {
 		dateFormat = fmt.Sprintf(`(%s|%s)`, dateSingle, dateRange)
 		dateInputs = fmt.Sprintf(`(%s,)*%s`, dateFormat, dateFormat)
 		dateAccept = fmt.Sprintf(`(|%s)`, dateInputs)
-		dateRegex  = regexp.MustCompile(fmt.Sprintf(`^.+;%s;%s$`, dateAccept, dateAccept))
+		dateRegex  = regexp.MustCompile(fmt.Sprintf(`^[^;]+;%s;%s$`, dateAccept, dateAccept))
 	)
 
 	for _, line := range strings.Split(data, "\n") {
