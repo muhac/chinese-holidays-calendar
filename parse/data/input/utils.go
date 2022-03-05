@@ -21,7 +21,7 @@ func holidays(year int, daysRaw string) (result []string) {
 	for _, day := range days {
 		if strings.Contains(day, "-") {
 			period := strings.Split(day, "-")
-			for d := date(year, period[0]); d.Before(date(year, period[1]).Add(time.Hour)); d = d.AddDate(0, 0, 1) {
+			for d := date(year, period[0]); !d.After(date(year, period[1])); d = d.AddDate(0, 0, 1) {
 				result = append(result, d.Format("1.2"))
 			}
 		} else {

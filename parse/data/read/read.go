@@ -7,6 +7,7 @@ import (
 	"main/parse/data"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -37,7 +38,17 @@ func (dw dataReader) Read() (result data.Input) {
 				fmt.Printf("Error loading %s: %s", file.Name, err)
 				return
 			}
-			resultChan <- data.InputRaw{Year: file.Year, Data: raw}
+
+			result := data.InputRaw{
+				Year: file.Year,
+				Data: lines(raw),
+			}
+			if len(result.Data) == 0 {
+				fmt.Printf("No data in %s", file.Name)
+				return
+			}
+
+			resultChan <- result
 		}(f)
 	}
 
@@ -46,8 +57,8 @@ func (dw dataReader) Read() (result data.Input) {
 		close(resultChan)
 	}()
 
-	for data := range resultChan {
-		result = append(result, data)
+	for content := range resultChan {
+		result = append(result, content)
 	}
 	return result
 }
@@ -67,11 +78,11 @@ func (dw dataReader) fileList() (result []fileInfo) {
 }
 
 func (dw dataReader) load(filename string) (result string, err error) {
-	data, err := ioutil.ReadFile(dw.Dir + filename)
+	content, err := ioutil.ReadFile(dw.Dir + filename)
 	if err != nil {
 		return result, err
 	}
-	return string(data), nil
+	return string(content), nil
 }
 
 func year(filename string) (result int, err error) {
@@ -80,4 +91,23 @@ func year(filename string) (result int, err error) {
 		return 0, fmt.Errorf("%s is not a valid filename", filename)
 	}
 	return strconv.Atoi(filename[:4])
+}
+
+func lines(data string) (result []string) {
+	var (
+		dateSingle = `(\d?\d.\d?\d)`
+		dateRange  = fmt.Sprintf(`(%s-%s)`, dateSingle, dateSingle)
+		dateFormat = fmt.Sprintf(`(%s|%s)`, dateSingle, dateRange)
+		dateInputs = fmt.Sprintf(`(%s,)*%s`, dateFormat, dateFormat)
+		dateAccept = fmt.Sprintf(`(|%s)`, dateInputs)
+		dateRegex  = regexp.MustCompile(fmt.Sprintf(`^.+;%s;%s$`, dateAccept, dateAccept))
+	)
+
+	for _, line := range strings.Split(data, "\n") {
+		line = strings.TrimSpace(line)
+		if dateRegex.MatchString(line) {
+			result = append(result, line)
+		}
+	}
+	return result
 }
