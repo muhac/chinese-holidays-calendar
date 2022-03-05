@@ -1,9 +1,19 @@
 package data
 
-import "main/parse/base"
+import (
+	"main/parse/base"
+)
 
 type Reader interface {
 	Read() Input
+}
+
+type Parser interface {
+	Parse(Input) base.Holidays
+}
+
+type Formatter interface {
+	Format(base.Holidays) Output
 }
 
 type Writer interface {
@@ -16,15 +26,11 @@ type Input []InputRaw
 // InputRaw per year
 type InputRaw struct {
 	Year int
-	Data string
+	Data []string
 }
 
-type Output string
-
-type Parser interface {
-	Parse(Input) base.Holidays
-}
-
-type Formatter interface {
-	Format(base.Holidays) Output
+type Output struct {
+	Prefix string
+	Body   []string
+	Suffix string
 }

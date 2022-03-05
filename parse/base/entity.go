@@ -7,10 +7,11 @@ type Holidays []Holiday
 
 // Holiday data per day
 type Holiday struct {
-	Date time.Time
-	Name string
-	Type int
-	Nth  int
+	Group string
+	Date  time.Time
+	Name  string
+	Type  int
+	Nth   int
 }
 
 func (h Holidays) Len() int           { return len(h) }

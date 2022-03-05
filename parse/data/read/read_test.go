@@ -2,6 +2,7 @@ package read
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -30,6 +31,26 @@ func Test_year(t *testing.T) {
 			}
 			if gotResult != tt.wantResult {
 				t.Errorf("year() gotResult = %v, want %v", gotResult, tt.wantResult)
+			}
+		})
+	}
+}
+
+func Test_lines(t *testing.T) {
+	type args struct {
+		data string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantResult []string
+	}{
+		{"1", args{"// none"}, nil},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotResult := lines(tt.args.data); !reflect.DeepEqual(gotResult, tt.wantResult) {
+				t.Errorf("lines() = %v, want %v", gotResult, tt.wantResult)
 			}
 		})
 	}
