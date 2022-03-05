@@ -12,6 +12,7 @@ type Holiday struct {
 	Name  string
 	Type  int
 	Nth   int
+	Total int
 }
 
 func (h Holidays) Len() int           { return len(h) }
