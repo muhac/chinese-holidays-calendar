@@ -6,10 +6,13 @@ import (
 )
 
 func main() {
-	holidays := core.Data().ReadFrom(base.SourceDir).Parse().Sort().Get()
+	holidays := core.Data().Read(`^20\d\d`).From("data").Parse().Sort().Get()
 
 	holidays.Print("==== HOLIDAYS ====")
 
-	core.Data(holidays).WriteTo(base.IndexPage).Format(base.ICS).Set()
-	core.Data(holidays).WriteTo(base.HolidayICS).Format(base.ICS).Set()
+	core.Data(holidays).Write("index.html").To("docs").Title("节假日").Set()
+	core.Data(holidays).Write("holiday.ics").To("docs").Title("节假日").Set()
+
+	core.Data(holidays.Select(base.Rest)).Write("rest.ics").To("docs").Title("节假日（假期）").Set()
+	core.Data(holidays.Select(base.Work)).Write("work.ics").To("docs").Title("节假日（补班）").Set()
 }
