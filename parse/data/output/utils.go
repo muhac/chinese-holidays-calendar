@@ -2,13 +2,12 @@ package output
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"main/parse/base"
 	"time"
 )
 
 const (
-	IcsHead  = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Rank Technology//Chinese Holidays//EN\nX-WR-CALNAME:节假日"
+	IcsHead  = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Rank Technology//Chinese Holidays//EN\nX-WR-CALNAME:%s"
 	IcsEvent = "BEGIN:VEVENT\nUID:%s\nDTSTART;VALUE=DATE:%s\nSUMMARY:%s\nDESCRIPTION:%s\nEND:VEVENT"
 	IcsTail  = "END:VCALENDAR"
 )
@@ -25,7 +24,7 @@ type event struct {
 func (d event) Ics() string {
 	return fmt.Sprintf(
 		IcsEvent,
-		uuid.NewString(),
+		d.Id,
 		d.Date.Format("20060102"),
 		d.Title,
 		d.Desc,
