@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func NewWriter(filename string) data.Writer {
-	return dataWriter{File: filename}
+func NewWriter(dir, file string) data.Writer {
+	return dataWriter{File: "./" + dir + "/" + file}
 }
 
 type dataWriter struct {

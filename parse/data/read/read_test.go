@@ -24,7 +24,7 @@ func Test_year(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotResult, err := year(tt.args.filename)
+			gotResult, err := year(tt.args.filename, `^\d{4}\.txt$`)
 			if err == nil && err != tt.wantErr || err != nil && tt.wantErr == nil {
 				t.Errorf("year() error = %v, wantErr %v", err, tt.wantErr)
 				return
