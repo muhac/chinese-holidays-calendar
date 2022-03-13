@@ -9,15 +9,15 @@ import (
 	"math/rand"
 )
 
-func NewFormatter(format string) data.Formatter {
-	return formatterICS{"节假日"}
+func NewFormatter(name string) data.Formatter {
+	return formatter{name}
 }
 
-type formatterICS struct{
+type formatter struct {
 	name string
 }
 
-func (f formatterICS) Format(info base.Holidays) (result data.Output) {
+func (f formatter) Format(info base.Holidays) (result data.Output) {
 	result.Prefix = fmt.Sprintf(IcsHead, f.name)
 	result.Suffix = IcsTail
 

@@ -2,33 +2,72 @@ package core
 
 import (
 	"main/parse/base"
+	"main/parse/data"
+	"main/parse/data/input"
+	"main/parse/data/output"
+	"main/parse/data/read"
+	"main/parse/data/write"
+	"sort"
 )
 
-func Data(optional ...base.Holidays) Handler {
-	return newHandler(optional...)
+func newHandler(optional ...base.Holidays) Handler {
+	if len(optional) == 0 {
+		return handler{}
+	}
+	return handler{data: optional[0]}
 }
 
-type Handler interface {
-	ReadFrom(directory string) Parser
-	WriteTo(file string) Formatter
+type handler struct {
+	data base.Holidays
+
+	reader   data.Reader
+	writer   data.Writer
+	filename string
+
+	input  data.Input
+	output data.Output
 }
 
-type Parser interface {
-	Parse() Sorter
+func (h handler) Read(filename string) setDirIn {
+	h.filename = filename
+	return h
 }
 
-type Sorter interface {
-	Sort() Getter
+func (h handler) From(directory string) readData {
+	h.reader = read.NewReader(directory, h.filename)
+	return h
 }
 
-type Formatter interface {
-	Format(format string) Setter
+func (h handler) Parse() getData {
+	h.input = h.reader.Read()
+	h.data = input.NewParser().Parse(h.input)
+	return h
 }
 
-type Getter interface {
-	Get() base.Holidays
+func (h handler) Sort() getData {
+	sort.Sort(h.data)
+	return h
 }
 
-type Setter interface {
-	Set()
+func (h handler) Write(filename string) setDirOut {
+	h.filename = filename
+	return h
+}
+
+func (h handler) To(directory string) setTitle {
+	h.writer = write.NewWriter(directory, h.filename)
+	return h
+}
+
+func (h handler) Title(name string) writeData {
+	h.output = output.NewFormatter(name).Format(h.data)
+	return h
+}
+
+func (h handler) Get() base.Holidays {
+	return h.data
+}
+
+func (h handler) Set() {
+	h.writer.Write(h.output)
 }

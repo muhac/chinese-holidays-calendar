@@ -15,6 +15,15 @@ type Holiday struct {
 	Total int
 }
 
+func (h Holidays) Where(filter func(Holiday) bool) (result Holidays) {
+	for _, item := range h {
+		if filter(item) {
+			result = append(result, item)
+		}
+	}
+	return
+}
+
 func (h Holidays) Len() int           { return len(h) }
 func (h Holidays) Less(i, j int) bool { return h[i].Date.Before(h[j].Date) }
 func (h Holidays) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }

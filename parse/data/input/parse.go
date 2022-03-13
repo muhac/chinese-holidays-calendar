@@ -25,7 +25,7 @@ func parse(raw data.InputRaw) (result base.Holidays, err error) {
 	dayCount := make(map[string]map[int]int)
 
 	for group, holiday := range raw.Data {
-		groupName := fmt.Sprintf("%04d%02d", raw.Year, group)
+		groupName := fmt.Sprintf("%04d%02d", raw.Year, group+1)
 		dayCount[groupName] = make(map[int]int)
 		info := strings.Split(holiday, ";")
 
