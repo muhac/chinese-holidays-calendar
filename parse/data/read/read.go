@@ -11,12 +11,13 @@ import (
 	"sync"
 )
 
-func NewReader(dir string) data.Reader {
-	return dataReader{Dir: dir}
+func NewReader(dir, file string) data.Reader {
+	return dataReader{Dir: "./" + dir + "/", File: file}
 }
 
 type dataReader struct {
-	Dir string
+	Dir  string
+	File string
 }
 
 type fileInfo struct {
@@ -70,7 +71,7 @@ func (dw dataReader) fileList() (result []fileInfo) {
 	}
 
 	for _, file := range files {
-		if yr, err := year(file.Name()); err == nil && !file.IsDir() {
+		if yr, err := year(file.Name(), dw.File); err == nil && !file.IsDir() {
 			result = append(result, fileInfo{Name: file.Name(), Year: yr})
 		}
 	}
@@ -85,8 +86,8 @@ func (dw dataReader) load(filename string) (result string, err error) {
 	return string(content), nil
 }
 
-func year(filename string) (result int, err error) {
-	regex := regexp.MustCompile(`^\d{4}\.txt$`)
+func year(filename, format string) (result int, err error) {
+	regex := regexp.MustCompile(format)
 	if !regex.MatchString(filename) {
 		return 0, fmt.Errorf("%s is not a valid filename", filename)
 	}
