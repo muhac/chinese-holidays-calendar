@@ -25,15 +25,15 @@ def main():
         with open(file, 'w') as f:
             f.write(
                 f"{comments[0]} ({beijing_time().strftime('%-m/%-d/%Y')})\n"
-                f"{comments[1]}\n\n// source: {link}\n\n{holidays}"
+                f"{comments[1]}\n// source: {link}\n\n{holidays}"
             )
 
-    update_info = "> Calendar data updated at: "
+    update_info = "> Calendar data updated "
     with open('./README.md', 'r') as f:
         content = f.read().split('\n')
     for i in range(len(content)):
         if content[i].startswith(update_info):
-            content[i] = update_info + beijing_time().strftime("%B %-d, %Y")
+            content[i] = update_info + beijing_time().strftime("at %-H:%M on %B %-d, %Y")
     with open('./README.md', 'w') as f:
         f.write('\n'.join(content))
 
