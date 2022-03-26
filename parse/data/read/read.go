@@ -105,6 +105,7 @@ func lines(data string) (result []string) {
 	)
 
 	for _, line := range strings.Split(data, "\n") {
+		line = strings.Split(line, "//")[0]
 		line = strings.TrimSpace(line)
 		if dateRegex.MatchString(line) {
 			result = append(result, line)
