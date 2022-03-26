@@ -2,6 +2,8 @@
 
 subscription link of public holidays in mainland China
 
+> data updated at: March 27, 2022
+
 ## Demo
 
 ![demo](./docs/readme/demo.png)
