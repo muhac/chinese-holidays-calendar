@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Iterator, Tuple
 
 import requests
@@ -24,16 +24,16 @@ def main():
 
         with open(file, 'w') as f:
             f.write(
-                f"{comments[0]} ({datetime.now().strftime('%-m/%-d/%Y')})\n"
+                f"{comments[0]} ({beijing_time().strftime('%-m/%-d/%Y')})\n"
                 f"{comments[1]}\n\n// source: {link}\n\n{holidays}"
             )
 
-    update_info = "> data updated at: "
+    update_info = "> Calendar data updated at: "
     with open('./README.md', 'r') as f:
         content = f.read().split('\n')
     for i in range(len(content)):
         if content[i].startswith(update_info):
-            content[i] = update_info + datetime.now().strftime("%B %-d, %Y")
+            content[i] = update_info + beijing_time().strftime("%B %-d, %Y")
     with open('./README.md', 'w') as f:
         f.write('\n'.join(content))
 
@@ -100,6 +100,11 @@ def source() -> Iterator[Tuple[str, str]]:
         if match is None:
             continue
         yield match.group('year'), match.group('link')
+
+
+def beijing_time() -> datetime:
+    utc_time = datetime.utcnow().replace(tzinfo=timezone.utc)
+    return utc_time.astimezone(timezone(timedelta(hours=8)))
 
 
 if __name__ == '__main__':
