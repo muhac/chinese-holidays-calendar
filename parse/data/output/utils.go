@@ -2,8 +2,9 @@ package output
 
 import (
 	"fmt"
-	"main/parse/base"
 	"time"
+
+	"main/parse/base"
 )
 
 const (
