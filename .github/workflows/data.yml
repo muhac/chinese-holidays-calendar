@@ -1,0 +1,68 @@
+name: Update Calendar Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+  push:
+    branches:
+      - "**"
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 2
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run crawler
+        shell: bash
+        run: python crawler.py
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Go Build
+        run: go build -o . main
+
+      - name: Generate ICS
+        run: ./main
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: docs/*.html docs/*.ics data/*.txt
+          commit_message: update calendar data automatically
+          commit_user_name: bugstop
+          commit_user_email: github@umm.one
+
+      - name: Get last commit message
+        id: last-commit-message
+        run: |
+          echo "::set-output name=msg::$(git log -1 --pretty=%s)"
+
+      - name: Update README
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: README.md
+          commit_message: ${{ steps.last-commit-message.outputs.msg }}
+          commit_user_name: bugstop
+          commit_user_email: github@umm.one
+          commit_options: '--amend --no-edit'
+          push_options: '--force'
+          skip_fetch: true
