@@ -3,9 +3,10 @@ package write
 import (
 	"fmt"
 	"log"
-	"main/parse/data"
 	"os"
 	"strings"
+
+	"main/parse/data"
 )
 
 func NewWriter(dir, file string) data.Writer {

@@ -2,11 +2,13 @@ package output
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"hash/crc32"
+	"math/rand"
+
+	"github.com/google/uuid"
+
 	"main/parse/base"
 	"main/parse/data"
-	"math/rand"
 )
 
 func NewFormatter(name string) data.Formatter {
