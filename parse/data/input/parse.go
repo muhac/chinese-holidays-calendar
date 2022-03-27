@@ -2,9 +2,10 @@ package input
 
 import (
 	"fmt"
+	"strings"
+
 	"main/parse/base"
 	"main/parse/data"
-	"strings"
 )
 
 func NewParser() data.Parser {
@@ -34,7 +35,7 @@ func parse(raw data.InputRaw) (result base.Holidays, err error) {
 				Group: groupName,
 				Name:  info[0],
 				Nth:   i + 1,
-				Date:  date(raw.Year, day),
+				Date:  day,
 				Type:  base.Rest,
 			}
 			result = append(result, restDay)
@@ -46,7 +47,7 @@ func parse(raw data.InputRaw) (result base.Holidays, err error) {
 				Group: groupName,
 				Name:  info[0],
 				Nth:   i + 1,
-				Date:  date(raw.Year, day),
+				Date:  day,
 				Type:  base.Work,
 			}
 			result = append(result, workDay)

@@ -1,8 +1,6 @@
 package data
 
-import (
-	"main/parse/base"
-)
+import "main/parse/base"
 
 type Reader interface {
 	Read() Input

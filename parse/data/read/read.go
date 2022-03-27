@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"main/parse/data"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
+
+	"main/parse/data"
 )
 
 func NewReader(dir, file string) data.Reader {

@@ -1,13 +1,14 @@
 package core
 
 import (
+	"sort"
+
 	"main/parse/base"
 	"main/parse/data"
 	"main/parse/data/input"
 	"main/parse/data/output"
 	"main/parse/data/read"
 	"main/parse/data/write"
-	"sort"
 )
 
 func newHandler(optional ...base.Holidays) Handler {
