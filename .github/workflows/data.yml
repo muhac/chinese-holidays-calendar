@@ -3,7 +3,7 @@ name: Update Calendar Data
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */12 * * *"
+    - cron: "0 0 1 * *"
   push:
     branches:
       - "**"
@@ -35,7 +35,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: 1.19
 
       - name: Go Build
         run: go build -o . main
@@ -49,7 +49,7 @@ jobs:
           file_pattern: docs/*.html docs/*.ics data/*.txt
           commit_message: update calendar data automatically
           commit_user_name: bugstop
-          commit_user_email: github@umm.one
+          commit_user_email: github@muhan.li
 
       - name: Get last commit message
         id: last-commit-message

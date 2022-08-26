@@ -2,8 +2,8 @@ package read
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -66,7 +66,7 @@ func (dw dataReader) Read() (result data.Input) {
 }
 
 func (dw dataReader) fileList() (result []fileInfo) {
-	files, err := ioutil.ReadDir(dw.Dir)
+	files, err := os.ReadDir(dw.Dir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +80,7 @@ func (dw dataReader) fileList() (result []fileInfo) {
 }
 
 func (dw dataReader) load(filename string) (result string, err error) {
-	content, err := ioutil.ReadFile(dw.Dir + filename)
+	content, err := os.ReadFile(dw.Dir + filename)
 	if err != nil {
 		return result, err
 	}
