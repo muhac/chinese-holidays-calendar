@@ -1,9 +1,9 @@
-package core
+package app
 
 import (
 	"sort"
 
-	"main/parse/base"
+	"main/parse/core"
 	"main/parse/data"
 	"main/parse/data/input"
 	"main/parse/data/output"
@@ -11,7 +11,7 @@ import (
 	"main/parse/data/write"
 )
 
-func newHandler(optional ...base.Holidays) Handler {
+func newHandler(optional ...core.Holidays) Handler {
 	if len(optional) == 0 {
 		return handler{}
 	}
@@ -19,7 +19,7 @@ func newHandler(optional ...base.Holidays) Handler {
 }
 
 type handler struct {
-	data base.Holidays
+	data core.Holidays
 
 	reader   data.Reader
 	writer   data.Writer
@@ -65,7 +65,7 @@ func (h handler) Title(name string) writeData {
 	return h
 }
 
-func (h handler) Get() base.Holidays {
+func (h handler) Get() core.Holidays {
 	return h.data
 }
 
