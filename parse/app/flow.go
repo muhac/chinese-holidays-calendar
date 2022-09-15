@@ -1,8 +1,8 @@
-package core
+package app
 
-import "main/parse/base"
+import "main/parse/core"
 
-func Data(optional ...base.Holidays) Handler {
+func Data(optional ...core.Holidays) Handler {
 	return newHandler(optional...)
 }
 
@@ -21,7 +21,7 @@ type readData interface {
 
 type getData interface {
 	Sort() getData
-	Get() base.Holidays
+	Get() core.Holidays
 }
 
 type setDirOut interface {

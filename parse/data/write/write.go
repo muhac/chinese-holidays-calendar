@@ -1,7 +1,6 @@
 package write
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -38,5 +37,5 @@ func (dw dataWriter) Write(data data.Output) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("write", n, "bytes to", dw.File)
+	log.Println("write", n, "bytes to", dw.File)
 }

@@ -9,6 +9,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/samber/lo"
+
 	"main/parse/data"
 )
 
@@ -37,7 +39,7 @@ func (dw dataReader) Read() (result data.Input) {
 			defer wg.Done()
 			raw, err := dw.load(file.Name)
 			if err != nil {
-				fmt.Printf("Error loading %s: %s", file.Name, err)
+				log.Printf("Error loading %s: %s\n", file.Name, err)
 				return
 			}
 
@@ -46,7 +48,7 @@ func (dw dataReader) Read() (result data.Input) {
 				Data: lines(raw),
 			}
 			if len(result.Data) == 0 {
-				fmt.Printf("No data in %s", file.Name)
+				log.Printf("No data in %s\n", file.Name)
 				return
 			}
 
@@ -71,12 +73,11 @@ func (dw dataReader) fileList() (result []fileInfo) {
 		log.Fatal(err)
 	}
 
-	for _, file := range files {
-		if yr, err := year(file.Name(), dw.File); err == nil && !file.IsDir() {
-			result = append(result, fileInfo{Name: file.Name(), Year: yr})
-		}
-	}
-	return result
+	return lo.FilterMap(files, func(file os.DirEntry, _ int) (fileInfo, bool) {
+		yr, err := year(file.Name(), dw.File)
+		isFile := err == nil && !file.IsDir()
+		return fileInfo{Name: file.Name(), Year: yr}, isFile
+	})
 }
 
 func (dw dataReader) load(filename string) (result string, err error) {
@@ -105,12 +106,11 @@ func lines(data string) (result []string) {
 		dateRegex  = regexp.MustCompile(fmt.Sprintf(`^[^;]+;%s;%s$`, dateAccept, dateAccept))
 	)
 
-	for _, line := range strings.Split(data, "\n") {
-		line = strings.Split(line, "//")[0]
-		line = strings.TrimSpace(line)
-		if dateRegex.MatchString(line) {
-			result = append(result, line)
-		}
-	}
-	return result
+	return lo.FilterMap(strings.Split(data, "\n"),
+		func(line string, _ int) (string, bool) {
+			line = strings.Split(line, "//")[0]
+			line = strings.TrimSpace(line)
+			return line, dateRegex.MatchString(line)
+		},
+	)
 }
