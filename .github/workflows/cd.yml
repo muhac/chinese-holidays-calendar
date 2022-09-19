@@ -18,7 +18,7 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 2
 
-      - name: Set up Python environment
+      - name: Setup Python environment
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
@@ -28,11 +28,11 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run crawler
+      - name: Run crawler script
         shell: bash
         run: python crawler.py
 
-      - name: Setup Go
+      - name: Setup Go environment
         uses: actions/setup-go@v2
         with:
           go-version: 1.19
@@ -40,7 +40,7 @@ jobs:
       - name: Go Build
         run: go build -o . main
 
-      - name: Generate ICS
+      - name: Generate ICS files
         run: ./main
 
       - name: Commit changes

@@ -43,16 +43,16 @@ func (dw dataReader) Read() (result data.Input) {
 				return
 			}
 
-			result := data.InputRaw{
+			res := data.InputRaw{
 				Year: file.Year,
 				Data: lines(raw),
 			}
-			if len(result.Data) == 0 {
+			if len(res.Data) == 0 {
 				log.Printf("No data in %s\n", file.Name)
 				return
 			}
 
-			resultChan <- result
+			resultChan <- res
 		}(f)
 	}
 
@@ -74,8 +74,8 @@ func (dw dataReader) fileList() (result []fileInfo) {
 	}
 
 	return lo.FilterMap(files, func(file os.DirEntry, _ int) (fileInfo, bool) {
-		yr, err := year(file.Name(), dw.File)
-		isFile := err == nil && !file.IsDir()
+		yr, e := year(file.Name(), dw.File)
+		isFile := e == nil && !file.IsDir()
 		return fileInfo{Name: file.Name(), Year: yr}, isFile
 	})
 }

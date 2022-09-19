@@ -11,11 +11,11 @@ import (
 	"main/parse/data/write"
 )
 
-func newHandler(optional ...core.Holidays) Handler {
-	if len(optional) == 0 {
+func newHandler(optionalData ...core.Holidays) Handler {
+	if len(optionalData) == 0 {
 		return handler{}
 	}
-	return handler{data: optional[0]}
+	return handler{data: optionalData[0]}
 }
 
 type handler struct {
