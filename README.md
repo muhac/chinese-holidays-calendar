@@ -1,6 +1,6 @@
 # 中国大陆节假日安排 · 日历订阅<br><br>Chinese Holidays Calendar
 
-subscription link of public holidays in mainland China
+Subscription link of public holidays in mainland China
 
 > Calendar data updated at 1:37 on September 26, 2022
 
