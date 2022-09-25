@@ -1,17 +1,17 @@
 package data
 
-import "main/parse/base"
+import "main/parse/core"
 
 type Reader interface {
 	Read() Input
 }
 
 type Parser interface {
-	Parse(Input) base.Holidays
+	Parse(Input) core.Holidays
 }
 
 type Formatter interface {
-	Format(base.Holidays) Output
+	Format(core.Holidays) Output
 }
 
 type Writer interface {

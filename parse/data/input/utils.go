@@ -18,17 +18,18 @@ func date(year int, date string) (result time.Time) {
 	return
 }
 
-func holidays(year int, daysRaw string) (result []time.Time) {
-	if daysRaw == "" {
+func holidays(year int, days string) (result []time.Time) {
+	if days == "" {
 		return
 	}
 
-	days := strings.Split(daysRaw, ",")
-	for _, day := range days {
+	for _, day := range strings.Split(days, ",") {
 		if strings.Contains(day, "-") {
 			period := strings.Split(day, "-")
-			for d := date(year, period[0]); !d.After(date(year, period[1])); d = d.AddDate(0, 0, 1) {
+			d := date(year, period[0])
+			for !d.After(date(year, period[1])) {
 				result = append(result, d)
+				d = d.AddDate(0, 0, 1)
 			}
 		} else {
 			result = append(result, date(year, day))
