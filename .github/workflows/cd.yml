@@ -1,4 +1,4 @@
-name: Update Calendar Data
+name: Continuous Delivery
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     - cron: "0 0 1 * *"
   push:
     branches:
-      - "**"
+      - "main"
 
 jobs:
   main:
