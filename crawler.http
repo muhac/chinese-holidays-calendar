@@ -1,0 +1,28 @@
+POST https://sousuoht.www.gov.cn/athena/forward/2B22E8E39E850E17F95A016A74FCB6B673336FA8B6FEC0E2955907EF9AEE06BE
+Content-Type: application/json;charset=UTF-8
+Athenaappname: %E5%9B%BD%E7%BD%91%E6%90%9C%E7%B4%A2
+Athenaappkey: R6kU1sKz%2BSHMWevvn8zRHAGJOwe6o53KEf7v0BJPVWY0Vxb4gIMCWDshQDWxw2Ua5CtSpEalXVlVzlj4mulMw6lnQzuqTEDDRC833wtXJyC%2F1kPbME1oCijkQOluRhbXZj3iRK1nXCzq5Sw%2F%2B2XbJbm%2BFEPLZRwoNNeYoOLcueg%3D
+
+{
+  "code": "17da70961a7",
+  "historySearchWords": [
+    "节假日安排"
+  ],
+  "dataTypeId": "107",
+  "orderBy": "time",
+  "searchBy": "title",
+  "appendixType": "",
+  "granularity": "ALL",
+  "trackTotalHits": true,
+  "beginDateTime": "",
+  "endDateTime": "",
+  "isSearchForced": 0,
+  "filters": [],
+  "pageNo": 1,
+  "pageSize": 10,
+  "customFilter": {
+    "operator": "and",
+    "properties": []
+  },
+  "searchWord": "节假日安排"
+}

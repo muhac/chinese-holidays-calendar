@@ -2,7 +2,7 @@
 
 Subscription link of public holidays in mainland China
 
-> Calendar data updated at 9:14 on June 21, 2023
+> Calendar data updated at 8:01 on November 3, 2023
 
 ## Demo
 
@@ -35,8 +35,8 @@ Subscription link of public holidays in mainland China
 ![overview](./docs/readme/overview.png)
 
 ## iOS 自动节假日闹钟
- 
+
 在周一至周五、调休补班日期自动打开标签内容包含「工作日闹钟」的闹钟  
 在周六、周日以及节假日假期自动关闭标签内容包含「工作日闹钟」的闹钟
 
-[戳此](https://www.icloud.com/shortcuts/71ddab11837b408188821c3d992e8e4c) 下载 iOS 快捷指令脚本，在「快捷指令」App 中设定一个每天凌晨运行的自动化任务吧～
+[戳此](https://www.icloud.com/shortcuts/71ddab11837b408188821c3d992e8e4c) 导入 iOS 快捷指令脚本，在「快捷指令」App 中设定一个每天凌晨运行的自动化任务吧～

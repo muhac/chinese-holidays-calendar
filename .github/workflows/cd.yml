@@ -50,11 +50,11 @@ jobs:
           commit_message: update calendar data automatically
           commit_user_name: Muhan Li
           commit_user_email: limuhan@msn.com
+          commit_author: Muhan Li <limuhan@msn.com>
 
       - name: Get last commit message
         id: last-commit-message
-        run: |
-          echo "::set-output name=msg::$(git log -1 --pretty=%s)"
+        run: echo "msg=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
 
       - name: Update README
         uses: stefanzweifel/git-auto-commit-action@v4
