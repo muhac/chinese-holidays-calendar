@@ -2,7 +2,7 @@
 
 Subscription link of public holidays in mainland China
 
-> Calendar data updated at 8:01 on November 3, 2023
+> Calendar data updated at 8:29 on November 3, 2023
 
 ## Demo
 
