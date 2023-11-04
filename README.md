@@ -15,14 +15,14 @@ Subscription link of public holidays in mainland China
 日历 - 添加日历 - 添加订阅日历 - 输入链接  
 「 [https://ics.github.rank.technology](https://ics.github.rank.technology) 」
 
-![iOS](./docs/readme/ios.png)
+![on iOS](./docs/readme/ios.jpg)
 
-### macOs
+### macOS
 
 日历 - 文件 - 新建日历订阅 - 输入链接  
 「 [https://ics.github.rank.technology](https://ics.github.rank.technology) 」
 
-![MacOs](./docs/readme/macos.png)
+![on macOS](./docs/readme/macos.png)
 
 ## 为补班添加不同的颜色
 
@@ -40,3 +40,9 @@ Subscription link of public holidays in mainland China
 在周六、周日以及节假日假期自动关闭标签内容包含「工作日闹钟」的闹钟
 
 [戳此](https://www.icloud.com/shortcuts/71ddab11837b408188821c3d992e8e4c) 导入 iOS 快捷指令脚本，在「快捷指令」App 中设定一个每天凌晨运行的自动化任务吧～
+
+## 维护者
+
+[@muhac](https://github.com/muhac)
+
+<a href="https://www.buymeacoffee.com/limuhan" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
