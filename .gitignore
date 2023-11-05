@@ -131,3 +131,7 @@ dmypy.json
 # MacOs trash
 .DS_Store
 .idea/
+
+# Haskell
+dist-newstyle/
+.vscode/

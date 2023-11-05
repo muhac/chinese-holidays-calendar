@@ -57,14 +57,14 @@ def data() -> Iterator[Tuple[str, str, str]]:
         for line in response.text.replace('<br/>', '\n').replace('</p>', '\n').split('\n'):
             if match := re.search(line_regex, line):
                 work, rest, *_ = match.group("detail").split('。')
-                dates = ';'.join((match.group("name"), parse(work), parse(rest)))
+                dates = ';'.join((match.group("name"), parse(work, year), parse(rest, year)))
                 print(dates)  # 已知需要人工干预如下情况: 1.与周末连休, 2.补休
-                results.append(f"{dates:30} // {match.group('detail')}")
+                results.append(f"{dates:50} // {match.group('detail')}")
 
         yield year, link, '\n'.join(results)
 
 
-def parse(text: str) -> str:
+def parse(text: str, year: str) -> str:
     """解析节假日安排数据"""
     results: list[str] = []
     range_type_a = r"(?P<m1>\d?\d)月(?P<d1>\d?\d)日至(?P<m2>\d?\d)月(?P<d2>\d?\d)日"
@@ -73,18 +73,18 @@ def parse(text: str) -> str:
 
     for item in text.split('、'):
         if match := re.search(range_type_a, item):
-            results.append(f"{match.group('m1')}.{match.group('d1')}-"
-                           f"{match.group('m2')}.{match.group('d2')}")
-            print(f"\tA: {results[-1]:15} {item}")
+            results.append(f"{year}.{match.group('m1')}.{match.group('d1')}-"
+                           f"{year}.{match.group('m2')}.{match.group('d2')}")
+            print(f"\tA: {results[-1]:25} {item}")
 
         elif match := re.search(range_type_b, item):
-            results.append(f"{match.group('m1')}.{match.group('d1')}-"
-                           f"{match.group('m1')}.{match.group('d2')}")
-            print(f"\tB: {results[-1]:15} {item}")
+            results.append(f"{year}.{match.group('m1')}.{match.group('d1')}-"
+                           f"{year}.{match.group('m1')}.{match.group('d2')}")
+            print(f"\tB: {results[-1]:25} {item}")
 
         elif match := re.search(single_date, item):
-            results.append(f"{match.group('m1')}.{match.group('d1')}")
-            print(f"\tS: {results[-1]:15} {item}")
+            results.append(f"{year}.{match.group('m1')}.{match.group('d1')}")
+            print(f"\tS: {results[-1]:25} {item}")
 
         else:
             print(f"\tX: {'':15} {item}")
