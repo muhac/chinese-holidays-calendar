@@ -9,8 +9,76 @@ on:
       - "**"
 
 jobs:
-  build:
-    name: Build
+  crawler:
+    name: Crawler Dry Run
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13-dev"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run crawler script
+        shell: bash
+        run: python crawler.py
+
+  parser:
+    name: Parser Dry Run
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ghc: ["9.2.8", "9.6", "latest"]
+        cabal: ["3.10.1.0", "3.10", "latest"]
+        exclude:
+          - ghc: latest
+            cabal: 3.10.1.0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Haskell ${{ matrix.ghc }} with Cabal ${{ matrix.cabal }}
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: ${{ matrix.cabal }}
+
+      - name: Configure the build
+        run: |
+          cabal configure --enable-tests --enable-benchmarks --disable-documentation
+          cabal build --dry-run
+
+      - name: Build
+        run: cabal build all
+
+      - name: Run tests
+        run: cabal test all
+
+      - name: Check cabal file
+        run: cabal check
+
+      - name: Run parser
+        run: cabal run
+
+      - name: Checkout files
+        run: |
+          pwd
+          ls -la
+          ls -la docs
+
+  hlint:
+    name: HLint
     runs-on: ubuntu-latest
 
     defaults:
@@ -18,24 +86,16 @@ jobs:
         working-directory: .
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v4
+      - name: "Set up HLint"
+        uses: haskell-actions/hlint-setup@v2
+
+      - name: "Run HLint"
+        uses: haskell-actions/hlint-run@v2
         with:
-          go-version-file: go.mod
-
-      - name: Go Build
-        run: go build -v ./...
-
-      - name: Go Test
-        run: go test ./... -shuffle on -count 10 -coverprofile cover.out
-
-      - name: Go Vet
-        run: go test -v ./... -vet all
-
-      - name: Coverage
-        run: go tool cover -func cover.out
+          path: parser/
+          fail-on: warning
 
   golint:
     name: Golint
@@ -53,21 +113,21 @@ jobs:
   pylint:
     name: Pylint
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ "3.11", "3.12" ]
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
+      - uses: actions/checkout@v4
+
+      - name: Set up Python Environment
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+          python-version: 3.12
+
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pylint
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Analysing the code with pylint
+
+      - name: Analyzing the code with pylint
         run: |
           pylint $(git ls-files '*.py')

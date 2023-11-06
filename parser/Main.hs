@@ -38,5 +38,5 @@ debug dataByYear = mapM_ showByYear $ sortByYear data'
     data' = map (\(y, r, w) -> (y, sortByDate $ r ++ w)) dataByYear
     sortByYear = sortBy (\(y1, _) (y2, _) -> compare y1 y2)
     showByYear (year, dates) = do
-      putStrLn $ "\nYear " ++ year
-      mapM (putStrLn . show) dates
+      putStrLn $ "\nYear" <> year
+      mapM_ print dates

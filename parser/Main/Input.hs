@@ -1,5 +1,6 @@
 module Main.Input where
 
+import Data.Char (isSpace)
 import Data.List.Split (splitOn)
 import Data.Time (UTCTime, addUTCTime, defaultTimeLocale, formatTime, parseTimeOrError)
 import Main.Base
@@ -7,7 +8,7 @@ import System.FilePath (takeBaseName)
 
 -- Join data from each year and each type
 join :: [(String, [Date], [Date])] -> [Date]
-join dataByFile = concatMap (\(_, rest, work) -> rest ++ work) dataByFile
+join = concatMap (\ (_, rest, work) -> rest ++ work)
 
 -- Parse holiday data
 -- Organized by year
@@ -19,21 +20,21 @@ parseByFile (file, content) = (year, rest, work)
     work = parse year content Work
 
 -- Convert data to Date
-parse :: String -> String -> DateDataType -> [Date]
+parse :: String -> String -> DateType -> [Date]
 parse year content flag = concatMap constructor $ zip (map head raw) dates
   where
-    constructor (name, dates) = map (constructDate name flag) dates
-    dates = map parseDate $ map (!! indexDateDataType flag) raw
+    constructor (name, dates) = constructDate name flag <$> dates
+    dates = parseDate <$> map (!! indexDateType flag) raw
     raw = parseFile content
 
 -- Parse data from file
 -- Result: [[Name, RestDays, WorkDays]]
 parseFile :: String -> [[String]]
-parseFile content = holidays
+parseFile content = filter ((== 3) . length) $ splitOn ";" <$> rawEvents
   where
-    holidays = filter ((== 3) . length) . map (splitOn ";") $ eachData
-    eachData = filter (not . null) . map (head . words) $ eachLine
-    eachLine = filter (not . null) . map (head . splitOn "//") $ lines content
+    rawEvents = filter (not . null) . map (head . words) $ uncomment
+    uncomment = filter (not . null) . map (head . splitOn "//") $ unindent
+    unindent = dropWhile isSpace <$> lines content
 
 -- Expand date ranges to UTCTime list
 -- Support multiple date ranges separated by comma
@@ -47,17 +48,18 @@ parseDate range = zip3 [1 ..] (repeat $ length dates) dates
 -- 1. like "2020.1.1"
 -- 2. like "2020.1.1-2020.1.3"
 parseDate' :: [String] -> [UTCTime]
-parseDate' [date] = [parseTime date]
+parseDate' [single] = [parseTime single]
 parseDate' [start, end]
   | start == end = parseDate' [end]
   | otherwise = first : parseDate' [second, end]
   where
     first = parseTime start
-    second = printTime $ addUTCTime 86400 first
+    second = printTime $ addUTCTime day first
+    day = 24 * 60 * 60
 
 -- Parse date in format "2020.1.1"
 parseTime :: String -> UTCTime
-parseTime date = parseTimeOrError True defaultTimeLocale "%Y.%-m.%-d" date :: UTCTime
+parseTime = parseTimeOrError True defaultTimeLocale "%Y.%-m.%-d"
 
 -- Format date in format "2020.1.1"
 printTime :: UTCTime -> String
