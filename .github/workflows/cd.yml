@@ -32,16 +32,19 @@ jobs:
         shell: bash
         run: python crawler.py
 
-      - name: Setup Go environment
-        uses: actions/setup-go@v4
+      - name: Setup Haskell and Cabal
+        uses: haskell-actions/setup@v2
         with:
-          go-version-file: go.mod
+          ghc-version: 9.2.8
+          cabal-version: 3.10.1.0
 
-      - name: Go Build
-        run: go build -o . main.go
+      - name: Configure and build
+        run: |
+          cabal configure --enable-tests --enable-benchmarks --disable-documentation
+          cabal build all
 
       - name: Generate ICS files
-        run: ./main
+        run: cabal run
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
