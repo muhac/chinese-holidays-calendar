@@ -16,12 +16,12 @@ parseByFile :: (FilePath, String) -> (String, [Date], [Date])
 parseByFile (file, content) = (year, rest, work)
   where
     year = takeBaseName file
-    rest = parse year content Rest
-    work = parse year content Work
+    rest = parse content Rest
+    work = parse content Work
 
 -- Convert data to Date
-parse :: String -> String -> DateType -> [Date]
-parse year content flag = concatMap constructor $ zip (map head raw) dates
+parse :: String -> DateType -> [Date]
+parse content flag = concatMap constructor $ zip (map head raw) dates
   where
     constructor (name, dates) = constructDate name flag <$> dates
     dates = parseDate <$> map (!! indexDateType flag) raw
