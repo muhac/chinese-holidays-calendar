@@ -24,7 +24,7 @@ description:        Calendar of Public Holidays in China
 -- PVP summary:     +-+------- breaking API changes
 --                  | | +----- non-breaking API additions
 --                  | | | +--- code changes with no API change
-version:            0.1.2.0
+version:            0.2.0.0
 
 -- A short (one-line) description of the package.
 -- synopsis:
@@ -53,6 +53,8 @@ build-type:         Simple
 
 -- Extra source files to be distributed with the package, such as examples, or a tutorial module.
 -- extra-source-files:
+
+-- formatting command: fourmolu --mode inplace $(git ls-files '*.hs') --indentation 2 --indent-wheres true
 
 common warnings
     ghc-options: -Wall

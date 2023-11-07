@@ -1,5 +1,6 @@
 module Main where
 
+import Data.Function (on)
 import Data.List (isPrefixOf, sortBy)
 import Main.Base
 import Main.Input
@@ -17,26 +18,22 @@ main = do
   contents <- mapM (readFile . ("./data" </>)) files
 
   -- parse data
-  let dataByFile = zip files contents
-  let dataByYear = map parseByFile dataByFile
-  let dataMixed = join dataByYear
-
-  -- debug log
-  debug dataByYear
+  let calendarYearly = zipWith parseFile files contents
+  debug calendarYearly
 
   -- write files
-  writeFile "./docs/index.html" $ icsByType Both dataMixed
+  let calendar = calendarYearly >>= join
+  writeFile "./docs/index.html" $ generate calendar Both
 
-  writeFile "./docs/main.ics" $ icsByType Both dataMixed
-  writeFile "./docs/rest.ics" $ icsByType Rest dataMixed
-  writeFile "./docs/work.ics" $ icsByType Work dataMixed
+  writeFile "./docs/main.ics" $ generate calendar Both
+  writeFile "./docs/rest.ics" $ generate calendar Rest
+  writeFile "./docs/work.ics" $ generate calendar Work
 
 -- Log holiday data ordered by each year
-debug :: [(String, [Date], [Date])] -> IO ()
-debug dataByYear = mapM_ showByYear $ sortByYear data'
-  where
-    data' = map (\(y, r, w) -> (y, sortByDate $ r ++ w)) dataByYear
-    sortByYear = sortBy (\(y1, _) (y2, _) -> compare y1 y2)
-    showByYear (year, dates) = do
-      putStrLn $ "\nYear" <> year
-      mapM_ print dates
+debug :: [Yearly] -> IO ()
+debug yearly =
+  let orderByYear = sortBy (compare `on` year) yearly
+      printByDate holiday = do
+        putStrLn $ "\nYear " ++ year holiday
+        mapM_ print $ sortByDate $ join holiday
+   in mapM_ printByDate orderByYear

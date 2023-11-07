@@ -4,47 +4,86 @@ import Data.Function (on)
 import Data.List (sortBy)
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 
-data DateType = Both | Rest | Work deriving (Enum)
+data Status = Both | Rest | Work deriving (Enum)
 
-instance Show DateType where
+instance Show Status where
   show Both = ""
   show Rest = "假期"
   show Work = "补班"
 
 -- Title of output ics file
-titleDateType :: DateType -> String
-titleDateType Both = "中国节假日安排"
-titleDateType flag = "中国节假日安排（" <> show flag <> "）"
+titleStatus :: Status -> String
+titleStatus Both = "中国节假日安排"
+titleStatus kind = "中国节假日安排（" ++ show kind ++ "）"
 
 -- Index of input txt file
-indexDateType :: DateType -> Int
-indexDateType Both = 0
-indexDateType Rest = 1
-indexDateType Work = 2
+indexStatus :: Status -> Int
+indexStatus Both = 0
+indexStatus Rest = 1
+indexStatus Work = 2
+
+instance Eq Status where
+  (==) = (==) `on` indexStatus
+
+data Yearly = Yearly
+  { year :: String
+  , rest :: [Holiday]
+  , work :: [Holiday]
+  }
+
+join :: Yearly -> [Holiday]
+join y = rest y ++ work y
+
+data HolidayRaw = HolidayRaw
+  { rawName :: String
+  , rawRest :: String
+  , rawWork :: String
+  }
+
+rawDate :: Status -> HolidayRaw -> String
+rawDate Rest = rawRest
+rawDate Work = rawWork
+rawDate _ = return ""
+
+toHolidayRaw :: [String] -> Maybe HolidayRaw
+toHolidayRaw [n, r, w] = Just $ HolidayRaw n r w
+toHolidayRaw _ = Nothing
+
+data Holiday = Holiday
+  { holidayGroup :: Group
+  , holidayDate :: Date
+  }
+
+instance Show Holiday where
+  show (Holiday group date) = unwords [show date, show group]
+
+toHolidays :: Group -> [Date] -> [Holiday]
+toHolidays group dates = Holiday group <$> dates
+
+data Group = Group
+  { holidayStatus :: Status
+  , holidayName :: String
+  }
+
+instance Show Group where
+  show (Group status name) = unwords [name, show status]
 
 data Date = Date
-  { name :: String,
-    time :: UTCTime,
-    flag :: DateType,
-    index :: Int,
-    total :: Int
+  { holidayIndex :: Int
+  , holidayTotal :: Int
+  , holidayTime :: UTCTime
   }
 
 instance Show Date where
-  show (Date name time flag index total) =
+  show (Date index total time) =
     unwords
-      [ formatTime defaultTimeLocale "%Y-%m-%d" time,
-        name,
-        show flag,
-        show index <> "/" <> show total
+      [ formatTime defaultTimeLocale "%Y-%m-%d" time
+      , show index ++ "/" ++ show total
       ]
 
-constructDate :: String -> DateType -> (Int, Int, UTCTime) -> Date
-constructDate name flag (index, total, time) = Date name time flag index total
+sortByDate :: [Holiday] -> [Holiday]
+sortByDate = sortBy (compare `on` holidayTime . holidayDate)
 
-sortByDate :: [Date] -> [Date]
-sortByDate = sortBy (compare `on` time)
-
-filterByType :: DateType -> [Date] -> [Date]
-filterByType Both = id
-filterByType flag = filter (\(Date _ _ f _ _) -> show f == show flag)
+filterByStatus :: Status -> [Holiday] -> [Holiday]
+filterByStatus Both = id
+filterByStatus kind = filter ((== kind) . holidayStatus . holidayGroup)

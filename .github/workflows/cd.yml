@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 2
@@ -38,34 +38,17 @@ jobs:
           ghc-version: 9.2.8
           cabal-version: 3.10.1.0
 
-      - name: Configure and build
-        run: |
-          cabal configure --enable-tests --enable-benchmarks --disable-documentation
-          cabal build all
+      - name: Build parser
+        run: cabal build
 
       - name: Generate ICS files
         run: cabal run
 
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          file_pattern: docs/*.html docs/*.ics data/*.txt
+          file_pattern: README.md docs/* data/*
           commit_message: update calendar data automatically
           commit_user_name: Muhan Li
           commit_user_email: limuhan@msn.com
           commit_author: Muhan Li <limuhan@msn.com>
-
-      - name: Get last commit message
-        id: last-commit-message
-        run: echo "msg=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
-
-      - name: Update README
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          file_pattern: README.md
-          commit_message: ${{ steps.last-commit-message.outputs.msg }}
-          commit_user_name: Muhan Li
-          commit_user_email: limuhan@msn.com
-          commit_options: '--amend --no-edit'
-          push_options: '--force'
-          skip_fetch: true
