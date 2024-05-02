@@ -3,7 +3,7 @@ name: Continuous Delivery
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 1/10 * *"
+    - cron: "0 0 1/16 * *"
   push:
     branches:
       - "main"
@@ -19,9 +19,9 @@ jobs:
           fetch-depth: 2
 
       - name: Setup Python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: "3.12"
 
       - name: Install Python dependencies
         run: |
@@ -35,8 +35,8 @@ jobs:
       - name: Setup Haskell and Cabal
         uses: haskell-actions/setup@v2
         with:
-          ghc-version: 9.2.8
-          cabal-version: 3.10.1.0
+          ghc-version: "9.6"
+          cabal-version: "3.10"
 
       - name: Build parser
         run: cabal build
@@ -50,5 +50,5 @@ jobs:
           file_pattern: README.md docs/* data/*
           commit_message: update calendar data automatically
           commit_user_name: Muhan Li
-          commit_user_email: limuhan@msn.com
-          commit_author: Muhan Li <limuhan@msn.com>
+          commit_user_email: 77625954+muhav@users.noreply.github.com
+          commit_author: Muhan Li <77625954+muhav@users.noreply.github.com>
