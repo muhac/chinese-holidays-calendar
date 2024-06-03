@@ -47,6 +47,7 @@ rawDate _ = return ""
 
 toHolidayRaw :: [String] -> Maybe HolidayRaw
 toHolidayRaw [n, r, w] = Just $ HolidayRaw n r w
+toHolidayRaw [n, r] = toHolidayRaw [n, r, ""]
 toHolidayRaw _ = Nothing
 
 data Holiday = Holiday

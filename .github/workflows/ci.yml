@@ -39,7 +39,7 @@ jobs:
 
     strategy:
       matrix:
-        ghc: ["9.6", "9.8", "latest"]
+        ghc: ["9.6", "9.8"]
         cabal: ["3.10", "latest"]
         include:
           - ghc: "9.2.8"
