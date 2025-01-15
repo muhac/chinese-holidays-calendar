@@ -67,8 +67,8 @@ def data() -> Iterator[Tuple[str, str, str]]:
 def parse(text: str, year: str) -> str:
     """解析节假日安排数据"""
     results: list[str] = []
-    range_type_a = r"(?P<m1>\d?\d)月(?P<d1>\d?\d)日至(?P<m2>\d?\d)月(?P<d2>\d?\d)日"
-    range_type_b = r"(?P<m1>\d?\d)月(?P<d1>\d?\d)日至(?P<d2>\d?\d)日"
+    range_type_a = r"(?P<m1>\d?\d)月(?P<d1>\d?\d)日(（[^）]+）)?至(?P<m2>\d?\d)月(?P<d2>\d?\d)日"
+    range_type_b = r"(?P<m1>\d?\d)月(?P<d1>\d?\d)日(（[^）]+）)?至(?P<d2>\d?\d)日"
     single_date = r"(?P<m1>\d?\d)月(?P<d1>\d?\d)日"
 
     for item in text.split('、'):
