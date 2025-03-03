@@ -1,6 +1,6 @@
 # 中国大陆节假日安排 · 日历订阅<br><br>Chinese Holidays Calendar
 
-Subscription link of public holidays in mainland China
+Calendar subscription link for public holidays in mainland China
 
 > Calendar data updated at 9:17 on March 1, 2025
 
