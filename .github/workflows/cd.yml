@@ -6,14 +6,47 @@ on:
     - cron: "0 0 1/16 * *"
   push:
     branches:
-      - "main"
+      - "**"
 
 jobs:
   main:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout vLLM
+        uses: actions/checkout@v4
+        with:
+          repository: "vllm-project/vllm"
+          ref: "v0.7.2"
+          path: vllm
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update  -y
+          sudo apt-get install -y gcc-12 g++-12 libnuma-dev jq
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 10 --slave /usr/bin/g++ g++ /usr/bin/g++-12
+
+      - name: Build vLLM
+        run: |
+          mv vllm .. && cd ../vllm
+          pip install --upgrade pip
+          pip install "cmake>=3.26" wheel packaging ninja "setuptools-scm>=8" numpy
+          pip install -v -r requirements-cpu.txt --extra-index-url https://download.pytorch.org/whl/cpu
+          sudo -E VLLM_TARGET_DEVICE=cpu python setup.py install
+
+      - name: Run models
+        run: vllm serve Qwen/Qwen2.5-1.5B-Instruct &> ../vllm.log &
+
+      - name: Wait for vLLM server
+        run: |
+          sleep 60
+          cat ../vllm.log
+          while ! grep -q "running on http://0.0.0.0:8000" ../vllm.log; do
+              sleep 1
+          done
+
+      - name: Checkout this repository
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 2
@@ -32,13 +65,8 @@ jobs:
         shell: bash
         run: python crawler.py
 
-      - name: Run global scripts
-        shell: bash
-        run: |
-          for script in global/*/main.py; do
-            cd $(dirname $script)
-            python $(basename $script)
-          done
+      - name: Call LLM completion
+        run: python nlp_llm.py
 
       - name: Setup Haskell and Cabal
         uses: haskell-actions/setup@v2
@@ -52,6 +80,14 @@ jobs:
       - name: Generate ICS files
         run: cabal run
 
+      - name: Run global scripts
+        shell: bash
+        run: |
+          for script in global/*/main.py; do
+            cd $(dirname $script)
+            python $(basename $script)
+          done
+
       - name: Generate global data
         shell: bash
         run: |
@@ -61,6 +97,7 @@ jobs:
           done
 
       - name: Commit changes
+        if: github.ref == 'refs/heads/main'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           file_pattern: README.md data/* global/*/data/* docs/* docs/global/*/*
