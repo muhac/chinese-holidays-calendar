@@ -12,36 +12,33 @@ jobs:
 
   llm:
     name: LLM Dry Run
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
+      - name: Setup Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Checkout vLLM
         uses: actions/checkout@v4
         with:
           repository: "vllm-project/vllm"
-          ref: "v0.7.2"
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update  -y
-          sudo apt-get install -y gcc-12 g++-12 libnuma-dev jq
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 10 --slave /usr/bin/g++ g++ /usr/bin/g++-12
+          ref: "v0.7.3"
 
       - name: Build vLLM
         run: |
-          pip install --upgrade pip
-          pip install "cmake>=3.26" wheel packaging ninja "setuptools-scm>=8" numpy
-          pip install -v -r requirements-cpu.txt --extra-index-url https://download.pytorch.org/whl/cpu
-          sudo -E VLLM_TARGET_DEVICE=cpu python setup.py install
+          pip install -r requirements-cpu.txt
+          pip install -e .
 
       - name: Run models
         run: vllm serve Qwen/Qwen2.5-1.5B-Instruct &> vllm.log &
 
       - name: Wait for the server
         run: |
-          sleep 60   # for debugging, small models can be run with ~40s
+          sleep 30
           cat vllm.log
-          while ! grep -q "running on http://0.0.0.0:8000" vllm.log; do
+          while ! grep -q "Application startup complete." vllm.log; do
               sleep 1
           done
 
