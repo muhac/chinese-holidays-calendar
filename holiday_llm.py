@@ -74,7 +74,7 @@ def parse(year: str, lines: list[str]) -> list[str]:
         value = get_response(query).strip()
 
         if value and '\n' not in value and re.search(r";\d{4}\.\d{1,2}\.\d{1,2}", value):
-            lines[i] = f"{value:{padding}}// {line}"
+            lines[i] = f"{value:{padding}}// {text}"
 
         print(lines[i])
 

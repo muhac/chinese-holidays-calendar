@@ -36,7 +36,7 @@ jobs:
       - name: Call LLM completion
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
-        run: python nlp_llm.py
+        run: python holiday_llm.py
         continue-on-error: true
 
       - name: Setup Haskell and Cabal
