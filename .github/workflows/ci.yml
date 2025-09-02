@@ -11,58 +11,27 @@ on:
 jobs:
 
   llm:
-    name: LLM Dry Run
+    name: LLM Service
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout vLLM
-        uses: actions/checkout@v4
-        with:
-          repository: "vllm-project/vllm"
-          ref: "v0.7.2"
+      - uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Call OpenAI API
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
         run: |
-          sudo apt-get update  -y
-          sudo apt-get install -y gcc-12 g++-12 libnuma-dev jq
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 10 --slave /usr/bin/g++ g++ /usr/bin/g++-12
-
-      - name: Build vLLM
-        run: |
-          pip install --upgrade pip
-          pip install "cmake>=3.26" wheel packaging ninja "setuptools-scm>=8" numpy
-          pip install -v -r requirements-cpu.txt --extra-index-url https://download.pytorch.org/whl/cpu
-          sudo -E VLLM_TARGET_DEVICE=cpu python setup.py install
-
-      - name: Run models
-        run: vllm serve Qwen/Qwen2.5-1.5B-Instruct &> vllm.log &
-
-      - name: Wait for the server
-        run: |
-          sleep 60   # for debugging, small models can be run with ~40s
-          cat vllm.log
-          while ! grep -q "running on http://0.0.0.0:8000" vllm.log; do
-              sleep 1
-          done
-
-      - name: Show logs
-        run: cat vllm.log
-
-      - name: Test the server
-        run: curl --retry 5 --retry-delay 10 http://localhost:8000/v1/models
-
-      - name: Demo chat
-        run: |
-          curl http://localhost:8000/v1/chat/completions \
-          -o response.json \
-          -H "Content-Type: application/json" \
-          -d '{
-              "model": "Qwen/Qwen2.5-1.5B-Instruct",
+          curl https://api.openai.com/v1/chat/completions \
+            -o response.json \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -d '{
+              "model": "gpt-4.1-mini",
               "messages": [
-                  {"role": "system", "content": "You are a technical expert."},
-                  {"role": "user", "content": "What is GitHub Actions?"}
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": "给我写一首五言绝句"}
               ]
-          }'
+            }'
 
       - name: Show response
         run: cat response.json | jq . || cat response.json

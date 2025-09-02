@@ -6,12 +6,10 @@ import re
 import openai
 
 client = openai.OpenAI(
-    base_url="http://localhost:8000/v1",
-    api_key="NA",
+    api_key=os.environ["OPENAI_API_KEY"],
 )
 
-PROMPT = """你需要把自然语言处理成格式化内容.
-你将收到一个中国节假日的放假安排, 它包含了节日名, 放假日期和调休日期.
+PROMPT = """你将收到一个中国节假日的放假安排, 它包含了节日名, 放假日期和调休日期.
 
 数据格式为: 节日名;放假日期;补班日期
 如果没有补班, 可以省略为: 节日名;放假日期
@@ -87,10 +85,11 @@ def get_response(query: str) -> str:
     """获取 LLM 的处理结果"""
     try:
         completion = client.chat.completions.create(
-            model="Qwen/Qwen2.5-1.5B-Instruct",
+            model="gpt-4.1-mini",
             messages=[
+                {"role": "system", "content": "你需要把自然语言处理成格式化内容."},
                 {"role": "user", "content": PROMPT + query},
-            ]
+            ],
         )
         return completion.choices[0].message.content
 
