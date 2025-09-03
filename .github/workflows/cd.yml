@@ -52,27 +52,11 @@ jobs:
       - name: Generate ICS files
         run: cabal run
 
-      - name: Run global scripts
-        shell: bash
-        run: |
-          for script in global/*/main.py; do
-            cd $(dirname $script)
-            python $(basename $script)
-          done
-
-      - name: Generate global data
-        shell: bash
-        run: |
-          for script in global/*/deploy.sh; do
-            cd $(dirname $script)
-            bash $(basename $script) 2>/dev/null
-          done
-
       - name: Commit changes
         if: github.ref == 'refs/heads/main'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          file_pattern: README.md data/* global/*/data/* docs/* docs/global/*/*
+          file_pattern: README.md data/* docs/*
           commit_message: update calendar data automatically
           commit_user_name: Muhan Li
           commit_user_email: 77625954+muhav@users.noreply.github.com

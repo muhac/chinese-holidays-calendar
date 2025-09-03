@@ -60,14 +60,6 @@ jobs:
         shell: bash
         run: python crawler.py
 
-      - name: Run global scripts
-        shell: bash
-        run: |
-          for script in global/*/main.py; do
-            cd $(dirname $script)
-            python $(basename $script)
-          done
-
   parser:
     name: Parser Dry Run
     runs-on: ubuntu-latest
