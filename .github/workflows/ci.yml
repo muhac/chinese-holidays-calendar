@@ -51,14 +51,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync --locked
 
       - name: Run crawler script
         shell: bash
-        run: python crawler.py
+        run: uv run python crawler.py
 
   parser:
     name: Parser Dry Run
@@ -136,12 +137,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pylint
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies (uv dev)
+        run: uv sync --dev --locked
 
       - name: Analyzing the code with pylint
-        run: |
-          pylint $(git ls-files '*.py')
+        run: uv run pylint $(git ls-files '*.py')

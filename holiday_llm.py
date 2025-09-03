@@ -2,13 +2,14 @@
 
 import os
 import re
+
 import openai
+from langsmith.wrappers import wrap_openai
+from langsmith import traceable
 
 model = os.environ.get("OPENAI_MODEL")
-client = openai.OpenAI(
-    api_key=os.environ["OPENAI_API_KEY"],
-)
-
+key = os.environ.get("OPENAI_API_KEY")
+client = wrap_openai(openai.Client(api_key=key))
 
 SYSTEM = "你需要把自然语言处理成格式化内容."
 PROMPT_PATH = os.path.join(os.path.dirname(__file__), "holiday_llm.prompt")
@@ -57,6 +58,7 @@ def parse(year: str, lines: list[str]) -> list[str]:
     return lines
 
 
+@traceable
 def get_response(query: str) -> str:
     """获取 LLM 的处理结果"""
     try:

@@ -24,20 +24,25 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies (uv)
+        run: uv sync --locked
 
       - name: Run crawler script
         shell: bash
-        run: python crawler.py
+        run: uv run python crawler.py
 
       - name: Call LLM completion
         env:
-          OPENAI_MODEL: "gpt-4.1-mini"
+          LANGSMITH_TRACING: "true"
+          LANGSMITH_ENDPOINT: "https://api.smith.langchain.com"
+          LANGSMITH_PROJECT: "chinese-holidays-calendar"
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_APIKEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
-        run: python holiday_llm.py
+          OPENAI_MODEL: "gpt-4.1-mini"
+        run: uv run python holiday_llm.py
         continue-on-error: true
 
       - name: Setup Haskell and Cabal
