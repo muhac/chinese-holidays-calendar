@@ -35,6 +35,7 @@ jobs:
 
       - name: Call LLM completion
         env:
+          OPENAI_MODEL: "gpt-4.1-mini"
           OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
         run: python holiday_llm.py
         continue-on-error: true
