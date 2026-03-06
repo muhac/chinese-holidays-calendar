@@ -71,7 +71,7 @@ def get_response(query: str) -> str:
         )
         return completion.choices[0].message.content
 
-    except openai.APIConnectionError as e:
+    except openai.APIError as e:
         print(e, query)
         return ""
 
