@@ -18,15 +18,74 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Call OpenAI API
+        id: call_openai
+        continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
         run: |
-          curl https://api.openai.com/v1/chat/completions \
+          curl --fail https://api.openai.com/v1/chat/completions \
             -o response.json \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
             -d '{
               "model": "gpt-4.1-mini",
+              "messages": [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": "给我写一首五言绝句"}
+              ]
+            }'
+
+      - name: Start local LLM (fallback)
+        id: run_local_llm
+        if: steps.call_openai.outcome == 'failure'
+        uses: muhac/llm-actions@v1
+        with:
+          model: Qwen/Qwen3-1.7B
+
+      - name: Call local LLM API (fallback)
+        if: steps.call_openai.outcome == 'failure'
+        run: |
+          curl --fail http://localhost:8000/v1/chat/completions \
+            -o response.json \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "Qwen/Qwen3-1.7B",
+              "messages": [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": "给我写一首五言绝句"}
+              ]
+            }'
+
+      - name: Show response
+        run: cat response.json | jq . || cat response.json
+
+  local_llm:
+    name: Local LLM Test
+    runs-on: ubuntu-latest
+    permissions: {}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start local LLM
+        id: run_local_llm
+        uses: muhac/llm-actions@v1
+        with:
+          model: Qwen/Qwen3-1.7B
+
+      - name: Show vLLM logs
+        run: echo "${{ steps.run_local_llm.outputs.logs }}"
+
+      - name: Test the server
+        run: curl --retry 5 --retry-delay 10 http://localhost:8000/v1/models
+
+      - name: Demo inference
+        run: |
+          curl --fail http://localhost:8000/v1/chat/completions \
+            -o response.json \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "Qwen/Qwen3-1.7B",
               "messages": [
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": "给我写一首五言绝句"}
