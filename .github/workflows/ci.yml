@@ -66,10 +66,11 @@ jobs:
             -d '{
               "model": "Qwen/Qwen3-1.7B",
               "messages": [
-                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "system", "content": "/no_think"},
                 {"role": "user", "content": "给我写一首五言绝句"}
               ]
             }'
+          # /no_think disables the reasoning chain on Qwen3 models
 
       - name: Show response
         run: cat response.json | jq . || cat response.json
