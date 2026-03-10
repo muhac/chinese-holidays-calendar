@@ -19,6 +19,8 @@ with open(PROMPT_PATH, encoding="utf-8") as _f:
 
 def main():
     """更新节假日信息文件"""
+    processed = False
+
     for file in os.listdir('./data'):
         if file.endswith('.txt'):
             with open(f'./data/{file}', encoding='utf-8') as f_obj:
@@ -27,11 +29,24 @@ def main():
             if "DATA NOT VERIFIED" not in content:
                 continue
 
+            processed = True
             data = parse(file[:4], content.split('\n'))
             data = '\n'.join(data).replace("DATA NOT VERIFIED", "// BY AI")
 
             with open(f'./data/{file}', 'w', encoding='utf-8') as f_obj:
                 f_obj.write(data)
+
+    if not processed:
+        demo()
+
+
+def demo():
+    """运行一个示例以验证 LLM 服务正常工作"""
+    print("No unverified files found. Running a demo query to preview LLM output...")
+    query = "2025年春节: 2月4日至12日放假调休，共9天。2月8日（周六）、2月22日（周六）上班。"
+    print(f"Input: {query}")
+    result = get_response(query)
+    print(f"Output: {result}")
 
 
 def parse(year: str, lines: list[str]) -> list[str]:
@@ -69,9 +84,10 @@ def get_response(query: str) -> str:
                 {"role": "user", "content": PROMPT + query},
             ],
         )
-        return completion.choices[0].message.content
+        content = completion.choices[0].message.content or ""
+        return re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
 
-    except openai.APIConnectionError as e:
+    except openai.APIError as e:
         print(e, query)
         return ""
 

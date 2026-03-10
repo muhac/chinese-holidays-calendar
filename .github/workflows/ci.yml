@@ -36,6 +36,66 @@ jobs:
       - name: Show response
         run: cat response.json | jq . || cat response.json
 
+  local_llm:
+    name: Local LLM Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start local LLM
+        id: run_local_llm
+        uses: muhac/llm-actions@v2
+        with:
+          model: Qwen/Qwen3-1.7B
+
+      - name: Show vLLM logs
+        env:
+          VLLM_LOGS: ${{ steps.run_local_llm.outputs.logs }}
+        run: echo "$VLLM_LOGS"
+
+      - name: Test the server
+        run: curl --retry 5 --retry-delay 10 http://localhost:8000/v1/models
+
+      - name: Demo inference
+        run: |
+          curl --fail http://localhost:8000/v1/chat/completions \
+            -o response.json \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "Qwen/Qwen3-1.7B",
+              "messages": [
+                {"role": "system", "content": "/no_think"},
+                {"role": "user", "content": "给我写一首五言绝句"}
+              ]
+            }'
+          # /no_think disables the reasoning chain on Qwen3 models
+
+      - name: Show response
+        run: cat response.json | jq . || cat response.json
+
+      - name: Setup Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Run LLM script with local model (preview)
+        env:
+          LANGSMITH_TRACING: "true"
+          LANGSMITH_ENDPOINT: "https://api.smith.langchain.com"
+          LANGSMITH_PROJECT: "chinese-holidays-calendar"
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_APIKEY }}
+          OPENAI_API_KEY: "EMPTY"
+          OPENAI_BASE_URL: "http://localhost:8000/v1"
+          OPENAI_MODEL: "Qwen/Qwen3-1.7B"
+        run: uv run python holiday_llm.py
+
   crawler:
     name: Crawler Dry Run
     runs-on: ubuntu-latest
