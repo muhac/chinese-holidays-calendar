@@ -46,7 +46,7 @@ jobs:
 
       - name: Start local LLM
         id: run_local_llm
-        uses: muhac/llm-actions@v1
+        uses: muhac/llm-actions@v2
         with:
           model: Qwen/Qwen3-1.7B
 
@@ -55,6 +55,24 @@ jobs:
 
       - name: Test the server
         run: curl --retry 5 --retry-delay 10 http://localhost:8000/v1/models
+
+      - name: Setup Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Run LLM script with local model (preview)
+        env:
+          OPENAI_API_KEY: "EMPTY"
+          OPENAI_BASE_URL: "http://localhost:8000/v1"
+          OPENAI_MODEL: "Qwen/Qwen3-1.7B"
+        run: uv run python holiday_llm.py
 
       - name: Demo inference
         run: |

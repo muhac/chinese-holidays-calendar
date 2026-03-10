@@ -49,7 +49,7 @@ jobs:
       - name: Start local LLM (fallback)
         id: start_local_llm
         if: steps.call_openai_llm.outcome == 'failure'
-        uses: muhac/llm-actions@v1
+        uses: muhac/llm-actions@v2
         with:
           model: Qwen/Qwen3-1.7B
 
