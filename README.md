@@ -2,7 +2,7 @@
 
 Calendar subscription link for public holidays in mainland China
 
-> Calendar data updated at 10:06 on March 1, 2026
+> Calendar data updated at 17:42 on March 10, 2026
 
 ## Demo
 
