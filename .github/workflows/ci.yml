@@ -51,10 +51,28 @@ jobs:
           model: Qwen/Qwen3-1.7B
 
       - name: Show vLLM logs
-        run: echo "${{ steps.run_local_llm.outputs.logs }}"
+        env:
+          VLLM_LOGS: ${{ steps.run_local_llm.outputs.logs }}
+        run: echo "$VLLM_LOGS"
 
       - name: Test the server
         run: curl --retry 5 --retry-delay 10 http://localhost:8000/v1/models
+
+      - name: Demo inference
+        run: |
+          curl --fail http://localhost:8000/v1/chat/completions \
+            -o response.json \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "Qwen/Qwen3-1.7B",
+              "messages": [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": "给我写一首五言绝句"}
+              ]
+            }'
+
+      - name: Show response
+        run: cat response.json | jq . || cat response.json
 
       - name: Setup Python environment
         uses: actions/setup-python@v5
@@ -73,22 +91,6 @@ jobs:
           OPENAI_BASE_URL: "http://localhost:8000/v1"
           OPENAI_MODEL: "Qwen/Qwen3-1.7B"
         run: uv run python holiday_llm.py
-
-      - name: Demo inference
-        run: |
-          curl --fail http://localhost:8000/v1/chat/completions \
-            -o response.json \
-            -H "Content-Type: application/json" \
-            -d '{
-              "model": "Qwen/Qwen3-1.7B",
-              "messages": [
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "给我写一首五言绝句"}
-              ]
-            }'
-
-      - name: Show response
-        run: cat response.json | jq . || cat response.json
 
   crawler:
     name: Crawler Dry Run
