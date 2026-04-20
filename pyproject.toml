@@ -8,7 +8,7 @@ dependencies = [
     "langsmith~=0.4.23",
     "openai~=1.105.0",
     "python-dateutil~=2.9.0.post0",
-    "requests~=2.32.5",
+    "requests~=2.33.0",
 ]
 
 [dependency-groups]
