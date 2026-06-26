@@ -42,7 +42,7 @@ jobs:
           LANGSMITH_PROJECT: "chinese-holidays-calendar"
           LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_APIKEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
-          OPENAI_MODEL: "gpt-4.1-mini"
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
         run: uv run python holiday_llm.py
         continue-on-error: true
 
