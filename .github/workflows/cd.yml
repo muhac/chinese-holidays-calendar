@@ -68,8 +68,8 @@ jobs:
       - name: Setup Haskell and Cabal
         uses: haskell-actions/setup@v2
         with:
-          ghc-version: "9.6"
-          cabal-version: "3.10"
+          ghc-version: "9.10"
+          cabal-version: "3.16"
 
       - name: Build parser
         run: cabal build
