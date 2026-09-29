@@ -31,7 +31,7 @@ icsEvent config (Holiday (Group status name) (Date index total time)) =
   unlines
     [ "BEGIN:VEVENT"
     , "UID:" ++ uuid
-    , "DTSTART;VALUE=DATE:" ++ formatTime defaultTimeLocale "%Y%m%d" time
+    , "DTSTART;VALUE=DATE:" ++ date
     , "SUMMARY:" ++ summary
     , "DESCRIPTION:" ++ prefix ++ show status ++ printf "第%d天 / 共%d天" index total
     , "END:VEVENT"
@@ -43,7 +43,10 @@ icsEvent config (Holiday (Group status name) (Date index total time)) =
     summary = if null nameEn then nameCn ++ show status else nameEn
     prefix = if nameInDescription config then nameCn ++ " " else ""
     uuid = toString $ fromWords a b c d
-    a = fst . head . readHex $ formatTime defaultTimeLocale "%Y%m%d" time
+    a = case readHex date of
+      [(n, "")] -> n
+      _ -> error $ "Unexpected date for UID: " ++ date
+    date = formatTime defaultTimeLocale "%Y%m%d" time
     b = fromIntegral $ shift index + total
     c = fromIntegral $ shift $ indexStatus status
     d = 0xa95511fe -- 955.WLB
