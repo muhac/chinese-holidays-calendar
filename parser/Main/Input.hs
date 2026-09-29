@@ -46,11 +46,11 @@ parseDate :: [String] -> [UTCTime]
 parseDate [""] = []
 parseDate [single] = [parseTime single]
 parseDate [start, end]
-  | start == end = parseDate [end]
-  | otherwise = first : parseDate [second, end]
+  | final < first = error $ "Invalid date range: " ++ start ++ "-" ++ end
+  | otherwise = takeWhile (<= final) $ iterate (addUTCTime day) first
   where
     first = parseTime start
-    second = printTime $ addUTCTime day first
+    final = parseTime end
     day = 24 * 60 * 60
 parseDate _ = []
 
