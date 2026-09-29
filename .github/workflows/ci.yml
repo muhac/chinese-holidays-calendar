@@ -130,7 +130,7 @@ jobs:
       fail-fast: false
       matrix:
         ghc: [ "9.6", "9.10", "9.14" ]
-        cabal: [ "latest" ]
+        cabal: [ "3.16", "latest" ]
         include:
           # Same toolchain as Continuous Delivery
           - ghc: "9.6"
