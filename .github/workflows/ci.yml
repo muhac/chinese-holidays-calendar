@@ -130,9 +130,6 @@ jobs:
       matrix:
         ghc: [ "9.6", "9.8" ]
         cabal: [ "3.10", "latest" ]
-        include:
-          - ghc: "9.2.8"
-            cabal: "3.10.1.0"
 
     steps:
       - uses: actions/checkout@v4
