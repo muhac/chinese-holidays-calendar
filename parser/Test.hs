@@ -1,5 +1,6 @@
 module Main where
 
+import Control.Exception (ErrorCall, evaluate, try)
 import Data.Function (on)
 import Main.Base
 import Main.Input
@@ -142,6 +143,22 @@ testB6 =
         (map printTime $ parseDate ["2025.12.30", "2026.1.2"])
     )
 
+-- take 10 keeps a runaway range from hanging the test suite
+testB7 =
+  TestCase
+    ( assertEqual
+        "B7 - case 2. like 2020.1.1-2020.1.3 - zero-padded end"
+        ["2020.1.1", "2020.1.2", "2020.1.3"]
+        (map printTime $ take 10 $ parseDate ["2020.1.1", "2020.1.03"])
+    )
+
+testB8 =
+  TestCase $ do
+    result <- try (evaluate $ length $ take 10 $ parseDate ["2020.1.3", "2020.1.1"]) :: IO (Either ErrorCall Int)
+    case result of
+      Left _ -> return ()
+      Right n -> assertFailure $ "B8 - case 2. like 2020.1.1-2020.1.3 - reversed: expected an error, got " ++ show n ++ " dates"
+
 testC1 =
   TestCase
     ( assertEqual
@@ -216,6 +233,8 @@ tests =
     , TestLabel "Test parseDate 4" testB4
     , TestLabel "Test parseDate 5" testB5
     , TestLabel "Test parseDate 6" testB6
+    , TestLabel "Test parseDate 7" testB7
+    , TestLabel "Test parseDate 8" testB8
     , -- C. parseDates
       TestLabel "Test parseDates 1" testC1
     , TestLabel "Test parseDates 2" testC2
