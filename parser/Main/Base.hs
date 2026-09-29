@@ -1,8 +1,41 @@
 module Main.Base where
 
+import Control.Monad (mfilter)
 import Data.Function (on)
 import Data.List (sortBy)
+import Data.Maybe (fromMaybe)
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
+
+-- Calendar settings, overridable through environment variables
+data Config = Config
+  { calendarName :: String
+  , productId :: String
+  , writeIndex :: Bool
+  , nameInDescription :: Bool
+  }
+  deriving (Eq, Show)
+
+defaultConfig :: Config
+defaultConfig =
+  Config
+    { calendarName = "中国节假日安排"
+    , productId = "-//Rank Technology//Chinese Holidays//EN"
+    , writeIndex = True
+    , nameInDescription = False
+    }
+
+configFromEnv :: [(String, String)] -> Config
+configFromEnv env =
+  Config
+    { calendarName = setting "CALENDAR_NAME" calendarName
+    , productId = setting "CALENDAR_PRODID" productId
+    , writeIndex = flag "CALENDAR_WRITE_INDEX" writeIndex
+    , nameInDescription = flag "CALENDAR_NAME_IN_DESCRIPTION" nameInDescription
+    }
+  where
+    value key = mfilter (not . null) $ lookup key env
+    setting key field = fromMaybe (field defaultConfig) $ value key
+    flag key field = maybe (field defaultConfig) (`elem` ["1", "true"]) $ value key
 
 data Status = Both | Rest | Work deriving (Enum)
 
@@ -12,9 +45,9 @@ instance Show Status where
   show Work = "补班"
 
 -- Title of output ics file
-titleStatus :: Status -> String
-titleStatus Both = "中国节假日安排"
-titleStatus kind = "中国节假日安排（" ++ show kind ++ "）"
+titleStatus :: Config -> Status -> String
+titleStatus config Both = calendarName config
+titleStatus config kind = calendarName config ++ "（" ++ show kind ++ "）"
 
 -- Index of input txt file
 indexStatus :: Status -> Int
