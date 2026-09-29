@@ -132,7 +132,7 @@ jobs:
         cabal: [ "3.10", "latest" ]
         include:
           - ghc: "9.2.8"
-            cabal: "3.10.1.0"
+            cabal: "3.10.2.0"
 
     steps:
       - uses: actions/checkout@v4
