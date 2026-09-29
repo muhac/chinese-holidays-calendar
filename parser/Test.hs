@@ -2,8 +2,10 @@ module Main where
 
 import Control.Exception (ErrorCall, evaluate, try)
 import Data.Function (on)
+import Data.List (isPrefixOf)
 import Main.Base
 import Main.Input
+import Main.Output
 import System.Exit (exitFailure, exitSuccess)
 import Test.HUnit
 
@@ -213,6 +215,83 @@ testC6 =
         $ parseDates "2019.12.6,2020.1.1-2020.1.1,,,2021.11.11"
     )
 
+customConfig =
+  defaultConfig
+    { calendarName = "测试日历"
+    , productId = "-//Example//Test Calendar//EN"
+    , writeIndex = False
+    , nameInDescription = True
+    }
+
+testD1 =
+  TestCase
+    ( assertEqual
+        "D1 - config - defaults without env"
+        defaultConfig
+        $ configFromEnv []
+    )
+
+testD2 =
+  TestCase
+    ( assertEqual
+        "D2 - config - all env vars set"
+        customConfig
+        $ configFromEnv
+          [ ("CALENDAR_NAME", "测试日历")
+          , ("CALENDAR_PRODID", "-//Example//Test Calendar//EN")
+          , ("CALENDAR_WRITE_INDEX", "false")
+          , ("CALENDAR_NAME_IN_DESCRIPTION", "true")
+          ]
+    )
+
+testD3 =
+  TestCase
+    ( assertEqual
+        "D3 - config - empty env vars are ignored"
+        defaultConfig
+        $ configFromEnv [("CALENDAR_NAME", ""), ("CALENDAR_WRITE_INDEX", "")]
+    )
+
+eventFields config name =
+  filter (\l -> any (`isPrefixOf` l) ["SUMMARY:", "DESCRIPTION:"])
+    . lines
+    . icsEvent config
+    $ Holiday (Group Rest name) (Date 1 9 (parseTime "2026.2.15"))
+
+testE1 =
+  TestCase
+    ( assertEqual
+        "E1 - event - chinese name, default config"
+        ["SUMMARY:春节假期", "DESCRIPTION:假期第1天 / 共9天"]
+        $ eventFields defaultConfig "春节"
+    )
+
+testE2 =
+  TestCase
+    ( assertEqual
+        "E2 - event - english name, name in description"
+        ["SUMMARY:National Day", "DESCRIPTION:国庆节 假期第1天 / 共9天"]
+        $ eventFields customConfig "国庆节_National_Day"
+    )
+
+testE3 =
+  TestCase
+    ( assertEqual
+        "E3 - event - chinese name, name in description"
+        ["SUMMARY:春节假期", "DESCRIPTION:春节 假期第1天 / 共9天"]
+        $ eventFields customConfig "春节"
+    )
+
+testE4 =
+  TestCase
+    ( assertEqual
+        "E4 - calendar - name and product id"
+        ["PRODID:-//Example//Test Calendar//EN", "X-WR-CALNAME:测试日历（假期）"]
+        $ filter (\l -> any (`isPrefixOf` l) ["PRODID:", "X-WR-CALNAME:"])
+        $ lines
+        $ icsHead customConfig Rest
+    )
+
 tests :: Test
 tests =
   TestList
@@ -242,6 +321,15 @@ tests =
     , TestLabel "Test parseDates 4" testC4
     , TestLabel "Test parseDates 5" testC5
     , TestLabel "Test parseDates 6" testC6
+    , -- D. configFromEnv
+      TestLabel "Test configFromEnv 1" testD1
+    , TestLabel "Test configFromEnv 2" testD2
+    , TestLabel "Test configFromEnv 3" testD3
+    , -- E. output
+      TestLabel "Test output 1" testE1
+    , TestLabel "Test output 2" testE2
+    , TestLabel "Test output 3" testE3
+    , TestLabel "Test output 4" testE4
     ]
 
 main :: IO ()
