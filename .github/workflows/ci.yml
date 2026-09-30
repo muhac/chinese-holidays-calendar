@@ -13,16 +13,18 @@ jobs:
   llm:
     name: LLM Service
     runs-on: ubuntu-latest
+    # Dependabot and fork PR runs can't read Actions secrets
+    if: github.actor != 'dependabot[bot]' && !github.event.pull_request.head.repo.fork
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Call OpenAI API
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.4-mini' }}
         run: |
-          curl https://api.openai.com/v1/chat/completions \
+          curl --fail-with-body https://api.openai.com/v1/chat/completions \
             -o response.json \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
@@ -35,6 +37,7 @@ jobs:
             }')"
 
       - name: Show response
+        if: always()
         run: cat response.json | jq . || cat response.json
 
   local_llm:
@@ -42,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Start local LLM
         id: run_local_llm
@@ -76,12 +79,12 @@ jobs:
         run: cat response.json | jq . || cat response.json
 
       - name: Setup Python environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v10.2.0
 
       - name: Install dependencies
         run: uv sync --locked
@@ -105,15 +108,15 @@ jobs:
         python-version: [ "3.11", "3.12", "3.13" ]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v10.2.0
 
       - name: Install dependencies
         run: uv sync --locked
@@ -133,7 +136,7 @@ jobs:
         cabal: [ "3.16", "latest" ]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # CD covers the default settings; this covers the inputs
       - name: Generate ICS files with GHC ${{ matrix.ghc }} and Cabal ${{ matrix.cabal }}
@@ -168,7 +171,7 @@ jobs:
         working-directory: .
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: "Set up HLint"
         uses: haskell-actions/hlint-setup@v2
@@ -184,15 +187,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python Environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v10.2.0
 
       - name: Install dependencies (uv dev)
         run: uv sync --dev --locked
