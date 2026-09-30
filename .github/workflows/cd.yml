@@ -65,17 +65,8 @@ jobs:
           OPENAI_MODEL: "Qwen/Qwen3-1.7B"
         run: uv run python holiday_llm.py
 
-      - name: Setup Haskell and Cabal
-        uses: haskell-actions/setup@v2
-        with:
-          ghc-version: "9.10"
-          cabal-version: "3.16"
-
-      - name: Build parser
-        run: cabal build
-
       - name: Generate ICS files
-        run: cabal run
+        uses: ./.github/actions/generate-ics
 
       - name: Commit changes
         if: github.ref == 'refs/heads/main'

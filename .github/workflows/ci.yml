@@ -135,34 +135,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Haskell ${{ matrix.ghc }} with Cabal ${{ matrix.cabal }}
-        uses: haskell-actions/setup@v2
+      # CD covers the default settings; this covers the inputs
+      - name: Generate ICS files with GHC ${{ matrix.ghc }} and Cabal ${{ matrix.cabal }}
+        uses: ./.github/actions/generate-ics
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
+          calendar-name: 测试日历
+          product-id: "-//Example//Test Calendar//EN"
+          write-index: "false"
+          name-in-description: "true"
 
-      - name: Configure the build
+      - name: Check the settings were applied
         run: |
-          cabal configure --enable-tests --enable-benchmarks --disable-documentation
-          cabal build --dry-run
-
-      - name: Build
-        run: cabal build all
+          grep -q "^X-WR-CALNAME:测试日历$" docs/main.ics
+          grep -q "^PRODID:-//Example//Test Calendar//EN$" docs/main.ics
+          grep -q "^DESCRIPTION:春节 " docs/main.ics
+          git diff --exit-code docs/index.html
 
       - name: Run tests
         run: cabal test all
 
       - name: Check cabal file
         run: cabal check
-
-      - name: Run parser
-        run: cabal run
-
-      - name: Checkout files
-        run: |
-          pwd
-          ls -la
-          ls -la docs
 
   hlint:
     name: HLint
