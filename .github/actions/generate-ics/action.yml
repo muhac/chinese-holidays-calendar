@@ -1,0 +1,49 @@
+name: Generate ICS files
+description: Build the holiday calendar parser and generate ICS files from ./data into ./docs of the calling repository
+
+# Empty inputs fall back to the parser's defaults
+inputs:
+  calendar-name:
+    description: Calendar name (CALENDAR_NAME)
+    required: false
+    default: ""
+  product-id:
+    description: iCalendar PRODID (CALENDAR_PRODID)
+    required: false
+    default: ""
+  write-index:
+    description: Also write docs/index.html, "true" or "false" (CALENDAR_WRITE_INDEX)
+    required: false
+    default: ""
+  name-in-description:
+    description: Prefix event descriptions with the holiday name, "true" or "false" (CALENDAR_NAME_IN_DESCRIPTION)
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Haskell and Cabal
+      uses: haskell-actions/setup@v2
+      with:
+        ghc-version: "9.10"
+        cabal-version: "3.16"
+
+    # The parser is built from this action's own copy of the repository
+    - name: Build parser
+      id: build
+      shell: bash
+      working-directory: ${{ github.action_path }}/../../..
+      run: |
+        cabal build main
+        echo "bin=$(cabal list-bin main)" >> "$GITHUB_OUTPUT"
+
+    - name: Generate ICS files
+      shell: bash
+      env:
+        CALENDAR_NAME: ${{ inputs.calendar-name }}
+        CALENDAR_PRODID: ${{ inputs.product-id }}
+        CALENDAR_WRITE_INDEX: ${{ inputs.write-index }}
+        CALENDAR_NAME_IN_DESCRIPTION: ${{ inputs.name-in-description }}
+        PARSER_BIN: ${{ steps.build.outputs.bin }}
+      run: '"$PARSER_BIN"'

@@ -164,6 +164,29 @@ jobs:
           ls -la
           ls -la docs
 
+  # CD covers the default settings; this covers the inputs
+  action:
+    name: Generate ICS Action
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate ICS files with custom settings
+        uses: ./.github/actions/generate-ics
+        with:
+          calendar-name: 测试日历
+          product-id: "-//Example//Test Calendar//EN"
+          write-index: "false"
+          name-in-description: "true"
+
+      - name: Check the settings were applied
+        run: |
+          grep -q "^X-WR-CALNAME:测试日历$" docs/main.ics
+          grep -q "^PRODID:-//Example//Test Calendar//EN$" docs/main.ics
+          grep -q "^DESCRIPTION:春节 " docs/main.ics
+          git diff --exit-code docs/index.html
+
   hlint:
     name: HLint
     runs-on: ubuntu-latest
