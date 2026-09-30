@@ -135,46 +135,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Haskell ${{ matrix.ghc }} with Cabal ${{ matrix.cabal }}
-        uses: haskell-actions/setup@v2
+      # CD covers the default settings; this covers the inputs
+      - name: Generate ICS files with GHC ${{ matrix.ghc }} and Cabal ${{ matrix.cabal }}
+        uses: ./.github/actions/generate-ics
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
-
-      - name: Configure the build
-        run: |
-          cabal configure --enable-tests --enable-benchmarks --disable-documentation
-          cabal build --dry-run
-
-      - name: Build
-        run: cabal build all
-
-      - name: Run tests
-        run: cabal test all
-
-      - name: Check cabal file
-        run: cabal check
-
-      - name: Run parser
-        run: cabal run
-
-      - name: Checkout files
-        run: |
-          pwd
-          ls -la
-          ls -la docs
-
-  # CD covers the default settings; this covers the inputs
-  action:
-    name: Generate ICS Action
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Generate ICS files with custom settings
-        uses: ./.github/actions/generate-ics
-        with:
           calendar-name: 测试日历
           product-id: "-//Example//Test Calendar//EN"
           write-index: "false"
@@ -186,6 +152,12 @@ jobs:
           grep -q "^PRODID:-//Example//Test Calendar//EN$" docs/main.ics
           grep -q "^DESCRIPTION:春节 " docs/main.ics
           git diff --exit-code docs/index.html
+
+      - name: Run tests
+        run: cabal test all
+
+      - name: Check cabal file
+        run: cabal check
 
   hlint:
     name: HLint

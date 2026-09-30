@@ -19,6 +19,14 @@ inputs:
     description: Prefix event descriptions with the holiday name, "true" or "false" (CALENDAR_NAME_IN_DESCRIPTION)
     required: false
     default: ""
+  ghc-version:
+    description: GHC version to build the parser with
+    required: false
+    default: "9.10"
+  cabal-version:
+    description: cabal version to build the parser with
+    required: false
+    default: "3.16"
 
 runs:
   using: composite
@@ -26,8 +34,8 @@ runs:
     - name: Setup Haskell and Cabal
       uses: haskell-actions/setup@v2
       with:
-        ghc-version: "9.10"
-        cabal-version: "3.16"
+        ghc-version: ${{ inputs.ghc-version }}
+        cabal-version: ${{ inputs.cabal-version }}
 
     # The parser is built from this action's own copy of the repository
     - name: Build parser
