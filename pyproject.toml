@@ -5,10 +5,10 @@ description = "Chinese holidays calendar crawler and parser"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "langsmith~=0.8.18",
-    "openai~=1.105.0",
+    "langsmith>=0.8.18,<0.15.0",
+    "openai>=1.105,<3.36",
     "python-dateutil~=2.9.0.post0",
-    "requests~=2.33.0",
+    "requests>=2.33,<2.35",
 ]
 
 [dependency-groups]
